@@ -40,3 +40,4 @@ export function NavHeader() {
         </NavigationMenu>
     );
 }
+export default NavHeader;
