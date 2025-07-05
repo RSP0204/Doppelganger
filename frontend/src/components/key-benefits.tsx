@@ -2,7 +2,7 @@ const KeyBenefits = () => {
     return (
         <section className="py-20 text-center bg-gray-50">
             <h2 className="text-3xl font-bold">Key Benefits</h2>
-            <div className="container grid grid-cols-1 gap-8 mt-8 md:grid-cols-2 lg:grid-cols-4">
+            <div className="container grid grid-cols-1 gap-8 mt-8 mx-auto md:grid-cols-2 lg:grid-cols-4">
                 <div className="p-6 transition-shadow duration-300 bg-white rounded-lg shadow-md hover:shadow-xl">
                     <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 text-white rounded-full bg-primary">
                         {/* Icon placeholder */}
