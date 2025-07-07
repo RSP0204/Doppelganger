@@ -5,70 +5,83 @@ interface ParsedItem {
   explanation?: string;
 }
 
-interface ParsedSection {
-  header: string;
-  items: ParsedItem[];
+interface ParsedSubSection {
+  subHeader: string; // e.g., "Regarding Self-Service Onboarding:"
+  items: ParsedItem[]; // The bulleted questions/statements
+}
+
+interface ParsedMainSection {
+  header: string; // e.g., "Suggested Questions:"
+  subSections: ParsedSubSection[];
 }
 
 interface ParsedDialogue {
   analysisResultsHeader: string;
   generatedDialoguesHeader: string;
-  sections: ParsedSection[];
+  mainSections: ParsedMainSection[];
 }
 
 function parseDialogue(dialogue: string): ParsedDialogue {
   const parsed: ParsedDialogue = {
     analysisResultsHeader: 'Analysis Results',
     generatedDialoguesHeader: 'Generated Dialogues:',
-    sections: [],
+    mainSections: [],
   };
 
-  // Remove the initial "Analysis Results\nGenerated Dialogues:\n" part if present
-  let content = dialogue;
-  if (content.startsWith('Analysis Results\nGenerated Dialogues:\n')) {
-    content = content.substring('Analysis Results\nGenerated Dialogues:\n'.length);
-  }
+  // Split the dialogue by the main section headers
+  const parts = dialogue.split(/(\**Suggested (Questions|Statements):**)/);
 
-  // Regex to find Suggested Questions block
-  const questionsBlockMatch = content.match(/\*\*Suggested Questions:\*\*([\s\S]*?)(?=\*\*Suggested Statements:\*\*|$)/);
-  if (questionsBlockMatch && questionsBlockMatch[1]) {
-    const questionsContent = questionsBlockMatch[1].trim();
-    const questionsSection: ParsedSection = {
-      header: 'Suggested Questions:',
-      items: [],
+  for (let i = 1; i < parts.length; i += 2) {
+    const mainSectionHeader = parts[i].trim();
+    const mainSectionContent = parts[i + 1] ? parts[i + 1].trim() : '';
+
+    const currentMainSection: ParsedMainSection = {
+      header: mainSectionHeader,
+      subSections: [],
     };
 
-    // Regex to find each item within the questions content
-    const itemRegex = /(?:(?:\*\s*)|(?:\d+\.\s*))(.*?)(?:\s*\((.*?)\))?/g;
-    let match;
-    while ((match = itemRegex.exec(questionsContent)) !== null) {
-      questionsSection.items.push({
-        text: match[1].trim(),
-        explanation: match[2] ? match[2].trim() : undefined,
-      });
-    }
-    parsed.sections.push(questionsSection);
-  }
+    const lines = mainSectionContent.split('\n');
+    let currentSubSection: ParsedSubSection | null = null;
 
-  // Regex to find Suggested Statements block
-  const statementsBlockMatch = content.match(/\*\*Suggested Statements:\*\*([\s\S]*)/);
-  if (statementsBlockMatch && statementsBlockMatch[1]) {
-    const statementsContent = statementsBlockMatch[1].trim();
-    const statementsSection: ParsedSection = {
-      header: 'Suggested Statements:',
-      items: [],
-    };
+    for (const line of lines) {
+      const trimmedLine = line.trim();
 
-    // Regex to find each item within the statements content
-    const itemRegex = /(?:(?:\*\s*)|(?:\d+\.\s*))(.*?)(?:\s*\((.*?)\))?/g;
-    let match;
-    while ((match = itemRegex.exec(statementsContent)) !== null) {
-      statementsSection.items.push({
-        text: match[1].trim(),
-        explanation: match[2] ? match[2].trim() : undefined,
-      });
+      // Skip empty lines
+      if (!trimmedLine) continue;
+
+      // Match for numbered sub-section header: 1. **Regarding Self-Service Onboarding:**
+      const subHeaderMatch = trimmedLine.match(/^(\d+\.\s+\**.*?:?\**)/);
+      if (subHeaderMatch) {
+        if (currentSubSection) {
+          currentMainSection.subSections.push(currentSubSection);
+        }
+        currentSubSection = {
+          subHeader: subHeaderMatch[1].trim(),
+          items: [],
+        };
+        continue;
+      }
+
+      // Match for bulleted item: * "Question text" (Explanation)
+      // Or just * Question text (Explanation)
+      const itemMatch = trimmedLine.match(/^\*\s*(.*?)(?:\s*\((.*?)\))?$/);
+      if (itemMatch && currentSubSection) {
+        let itemText = itemMatch[1].trim();
+        // Remove surrounding quotes if present
+        if (itemText.startsWith('"') && itemText.endsWith('"')) {
+          itemText = itemText.substring(1, itemText.length - 1);
+        }
+        currentSubSection.items.push({
+          text: itemText,
+          explanation: itemMatch[2] ? itemMatch[2].trim() : undefined,
+        });
+      }
     }
-    parsed.sections.push(statementsSection);
+
+    if (currentSubSection) {
+      currentMainSection.subSections.push(currentSubSection);
+    }
+    parsed.mainSections.push(currentMainSection);
   }
 
   return parsed;
@@ -85,19 +98,24 @@ export default function ResultsDisplay({ generatedDialogues }: { generatedDialog
             const parsed = parseDialogue(dialogue);
             return (
               <div key={index} className="mb-6 p-4 border rounded-md bg-gray-50">
-                {parsed.sections.map((section, secIndex) => (
-                  <div key={secIndex} className="mb-4">
-                    <h4 className="text-lg font-bold text-blue-700 mb-2">{section.header}</h4>
-                    <ul className="list-disc list-inside space-y-2">
-                      {section.items.map((item, itemIndex) => (
-                        <li key={itemIndex}>
-                          <span className="font-medium">{item.text}</span>
-                          {item.explanation && (
-                            <span className="text-gray-600 italic ml-2">({item.explanation})</span>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
+                {parsed.mainSections.map((mainSection, mainSecIndex) => (
+                  <div key={mainSecIndex} className="mb-4">
+                    <h4 className="text-lg font-bold text-blue-700 mb-2">{mainSection.header}</h4>
+                    {mainSection.subSections.map((subSection, subSecIndex) => (
+                      <div key={subSecIndex} className="ml-4 mb-2"> {/* Indent sub-sections */}
+                        <h5 className="text-md font-semibold text-gray-800 mb-1">{subSection.subHeader}</h5>
+                        <ul className="list-disc list-inside space-y-1">
+                          {subSection.items.map((item, itemIndex) => (
+                            <li key={itemIndex}>
+                              <span className="font-medium">{item.text}</span>
+                              {item.explanation && (
+                                <span className="text-gray-600 italic ml-2">({item.explanation})</span>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
                   </div>
                 ))}
               </div>
