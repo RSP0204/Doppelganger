@@ -17,6 +17,7 @@ export default function TranscriptUploader() {
   const [role, setRole] = useState<string>('');
   const [generatedDialogues, setGeneratedDialogues] = useState<string[]>([]);
   const [showResults, setShowResults] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleFileDrop = (droppedFile: File) => {
     setFile(droppedFile);
@@ -25,33 +26,41 @@ export default function TranscriptUploader() {
   const handleSubmit = async () => {
     if (!file || !role) {
       alert('Please select a file and a role.');
-      
-return;
+      return;
     }
+
+    setIsLoading(true); // Set loading to true
 
     const reader = new FileReader();
     reader.onload = async (e) => {
       const transcriptText = e.target?.result as string;
 
-      const res = await fetch('/api/process-transcript', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ transcript: transcriptText, role }),
-      });
+      try {
+        const res = await fetch('/api/process-transcript', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ transcript: transcriptText, role }),
+        });
 
-      if (res.ok) {
-        const data = await res.json();
-        if (data) {
-          setGeneratedDialogues(Array.isArray(data.generated_dialogues) ? data.generated_dialogues : []);
+        if (res.ok) {
+          const data = await res.json();
+          if (data) {
+            setGeneratedDialogues(Array.isArray(data.generated_dialogues) ? data.generated_dialogues : []);
+          } else {
+            setGeneratedDialogues([]);
+          }
+          setShowResults(true);
         } else {
-          setGeneratedDialogues([]);
+          console.error('File upload failed');
+          setShowResults(false);
         }
-        setShowResults(true);
-      } else {
-        console.error('File upload failed');
+      } catch (error) {
+        console.error('An error occurred during transcript processing:', error);
         setShowResults(false);
+      } finally {
+        setIsLoading(false); // Set loading to false regardless of success or failure
       }
     };
     reader.readAsText(file);
@@ -71,7 +80,9 @@ return;
             <SelectItem value="startup-founder">Startup Founder</SelectItem>
           </SelectContent>
         </Select>
-        <Button onClick={handleSubmit}>Upload and Process</Button>
+        <Button onClick={handleSubmit} disabled={isLoading}>
+          {isLoading ? 'Processing...' : 'Upload and Process'}
+        </Button>
       </div>
       {showResults && generatedDialogues && Array.isArray(generatedDialogues) && generatedDialogues.length > 0 && (
         <ResultsDisplay generatedDialogues={generatedDialogues} />
