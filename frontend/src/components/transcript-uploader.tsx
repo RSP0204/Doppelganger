@@ -10,10 +10,13 @@ import {
   SelectValue,
 } from '@/registry/new-york-v4/ui/select';
 import Dropzone from './dropzone';
+import ResultsDisplay from './results-display';
 
 export default function TranscriptUploader() {
   const [file, setFile] = useState<File | null>(null);
   const [role, setRole] = useState<string>('');
+  const [generatedDialogues, setGeneratedDialogues] = useState<string[]>([]);
+  const [showResults, setShowResults] = useState<boolean>(false);
 
   const handleFileDrop = (droppedFile: File) => {
     setFile(droppedFile);
@@ -26,21 +29,32 @@ export default function TranscriptUploader() {
 return;
     }
 
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('role', role);
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const transcriptText = e.target?.result as string;
 
-    const res = await fetch('/api/upload-transcript', {
-      method: 'POST',
-      body: formData,
-    });
+      const res = await fetch('/api/process-transcript', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ transcript: transcriptText, role }),
+      });
 
-    if (res.ok) {
-      const data = await res.json();
-      console.log(data.message);
-    } else {
-      console.error('File upload failed');
-    }
+      if (res.ok) {
+        const data = await res.json();
+        if (data) {
+          setGeneratedDialogues(Array.isArray(data.generated_dialogues) ? data.generated_dialogues : []);
+        } else {
+          setGeneratedDialogues([]);
+        }
+        setShowResults(true);
+      } else {
+        console.error('File upload failed');
+        setShowResults(false);
+      }
+    };
+    reader.readAsText(file);
   };
 
   return (
@@ -59,6 +73,9 @@ return;
         </Select>
         <Button onClick={handleSubmit}>Upload and Process</Button>
       </div>
+      {showResults && generatedDialogues && Array.isArray(generatedDialogues) && generatedDialogues.length > 0 && (
+        <ResultsDisplay generatedDialogues={generatedDialogues} />
+      )}
     </div>
   );
 }
