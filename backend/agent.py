@@ -1,6 +1,5 @@
 import os
-# Commented out Gemini imports
-# from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from backend.prompts import PROMPT_TEMPLATES
@@ -12,8 +11,8 @@ load_dotenv()  # Load environment variables from .env file
 # --- Strategy Pattern Implementation ---
 # Configure which AI model strategy to use
 # To switch models, simply change the class assigned to CURRENT_MODEL_STRATEGY
-CURRENT_MODEL_STRATEGY: AIModelStrategy = MistralStrategy()
-# CURRENT_MODEL_STRATEGY: AIModelStrategy = GeminiStrategy() # Uncomment to switch back to Gemini
+# CURRENT_MODEL_STRATEGY: AIModelStrategy = MistralStrategy()
+CURRENT_MODEL_STRATEGY: AIModelStrategy = GeminiStrategy() # Uncomment to switch back to Gemini
 
 def get_llm_chain(role: str) -> LLMChain:
     """Initializes and returns a LangChain LLMChain for the given role using the selected strategy."""

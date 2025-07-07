@@ -4,8 +4,7 @@ from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from backend.prompts import PROMPT_TEMPLATES
 
-# Commented out Gemini imports
-# from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 # Mistral AI import
 from langchain_mistralai import ChatMistralAI
@@ -17,26 +16,24 @@ class AIModelStrategy(ABC):
 
 class GeminiStrategy(AIModelStrategy):
     def get_llm_chain(self, role: str) -> LLMChain:
-        # Commented out Gemini-specific code
-        # print(f"[GeminiStrategy] Initializing LLMChain for role: {role}")
-        # if role not in PROMPT_TEMPLATES:
-        #     raise ValueError(f"Role '{role}' is not supported.")
+        print(f"[GeminiStrategy] Initializing LLMChain for role: {role}")
+        if role not in PROMPT_TEMPLATES:
+            raise ValueError(f"Role '{role}' is not supported.")
 
-        # api_key = os.getenv("GEMINI_API_KEY")
-        # if not api_key:
-        #     raise ValueError("GEMINI_API_KEY not found in .env file or environment variables.")
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            raise ValueError("GEMINI_API_KEY not found in .env file or environment variables.")
 
-        # llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest", google_api_key=api_key)
-        # print("[GeminiStrategy] ChatGoogleGenerativeAI model initialized.")
+        llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest", google_api_key=api_key)
+        print("[GeminiStrategy] ChatGoogleGenerativeAI model initialized.")
 
-        # prompt_template = PromptTemplate(
-        #     template=PROMPT_TEMPLATES[role],
-        #     input_variables=["transcript_chunk"],
-        # )
-        # print("[GeminiStrategy] PromptTemplate created.")
+        prompt_template = PromptTemplate(
+            template=PROMPT_TEMPLATES[role],
+            input_variables=["transcript_chunk"],
+        )
+        print("[GeminiStrategy] PromptTemplate created.")
 
-        # return LLMChain(llm=llm, prompt=prompt_template)
-        raise NotImplementedError("GeminiStrategy is currently commented out and not implemented.")
+        return LLMChain(llm=llm, prompt=prompt_template)
 
 class MistralStrategy(AIModelStrategy):
     def get_llm_chain(self, role: str) -> LLMChain:
