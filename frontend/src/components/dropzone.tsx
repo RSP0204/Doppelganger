@@ -22,9 +22,6 @@ export default function Dropzone({ onFileDrop }: DropzoneProps) {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'application/pdf': ['.pdf'],
-      'application/msword': ['.doc'],
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
       'text/plain': ['.txt'],
     },
     multiple: false,
@@ -42,9 +39,9 @@ export default function Dropzone({ onFileDrop }: DropzoneProps) {
       {file ? (
         <p className="mt-2">Selected file: {file.name}</p>
       ) : (
-        <p className="mt-2">Drag & drop a file here, or click to select a file</p>
+        <p className="mt-2">Drag & drop a .txt file here, or click to select a file</p>
       )}
-      <p className="text-xs text-gray-500 mt-1">Supported file types: PDF, DOC, DOCX, TXT</p>
+      <p className="text-xs text-gray-500 mt-1">Supported file type: TXT</p>
     </div>
   );
 }

@@ -20,14 +20,18 @@ export default function TranscriptUploader() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleFileDrop = (droppedFile: File) => {
+    console.log('File dropped:', droppedFile.name);
     setFile(droppedFile);
   };
 
   const handleSubmit = async () => {
     if (!file || !role) {
       alert('Please select a file and a role.');
+      console.log('File or role not selected. File:', file, 'Role:', role);
       return;
     }
+
+    console.log('Submitting with file:', file.name, 'and role:', role);
 
     setIsLoading(true); // Set loading to true
 
@@ -36,7 +40,8 @@ export default function TranscriptUploader() {
       const transcriptText = e.target?.result as string;
 
       try {
-        const res = await fetch('/api/process-transcript', {
+        console.log('Sending transcript to backend:', { transcript: transcriptText.substring(0, 100) + '...', role });
+        const res = await fetch('/process-transcript', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -46,21 +51,29 @@ export default function TranscriptUploader() {
 
         if (res.ok) {
           const data = await res.json();
+          console.log('Backend response received:', data);
           if (data) {
-            setGeneratedDialogues(Array.isArray(data.generated_dialogues) ? data.generated_dialogues : []);
+            const dialogues = Array.isArray(data.generated_dialogues) ? data.generated_dialogues : [];
+            setGeneratedDialogues(dialogues);
+            console.log('Generated dialogues set:', dialogues.length, 'items');
           } else {
             setGeneratedDialogues([]);
+            console.log('No data received from backend.');
           }
           setShowResults(true);
+          console.log('Showing results.');
         } else {
-          console.error('File upload failed');
+          console.error('File upload failed with status:', res.status, res.statusText);
           setShowResults(false);
+          console.log('Not showing results.');
         }
       } catch (error) {
         console.error('An error occurred during transcript processing:', error);
         setShowResults(false);
+        console.log('Not showing results due to error.');
       } finally {
         setIsLoading(false); // Set loading to false regardless of success or failure
+        console.log('Loading state set to false.');
       }
     };
     reader.readAsText(file);
