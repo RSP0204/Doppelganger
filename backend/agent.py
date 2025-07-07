@@ -20,7 +20,7 @@ def get_llm_chain(role: str) -> LLMChain:
         print("[Agent] Error: GEMINI_API_KEY not found.")
         raise ValueError("GEMINI_API_KEY not found in .env file or environment variables.")
 
-    llm = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key=api_key)
+    llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest", google_api_key=api_key)
     print("[Agent] ChatGoogleGenerativeAI model initialized.")
 
     prompt_template = PromptTemplate(

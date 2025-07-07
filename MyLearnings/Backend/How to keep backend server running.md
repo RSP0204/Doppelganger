@@ -12,8 +12,9 @@
   To keep the backend server running, navigate
   to the backend directory in your terminal and
    run the following command:
-
-  uvicorn backend.app:app --reload
+   
+uvicorn backend.app:app --reload
+  
 
 
   This command starts the FastAPI application     
@@ -21,4 +22,3 @@
   ensures that the server automatically
   reloads if you make any changes to the
   backend code.
-  
