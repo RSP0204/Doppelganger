@@ -29,7 +29,7 @@ function parseDialogue(dialogue: string): ParsedDialogue {
   };
 
   // Split the dialogue by the main section headers
-  const parts = dialogue.split(/(\**Suggested (Questions|Statements):**)/);
+  const parts = dialogue.split(/(\*{2}Suggested (Questions|Statements):\*{2})/);
 
   for (let i = 1; i < parts.length; i += 2) {
     const mainSectionHeader = parts[i].trim();

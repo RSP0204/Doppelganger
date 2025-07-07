@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Image from 'next/image';
 
 import { cn } from '@/lib/utils';
@@ -13,11 +14,20 @@ export function LoginForm({
 }: React.ComponentProps<'div'> & {
     imageUrl?: string;
 }) {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        console.log('Login attempt with:', { email, password });
+        // Here you would typically send this data to your backend for authentication
+    };
+
     return (
         <div className={cn('flex flex-col gap-6', className)} {...props}>
             <Card className='overflow-hidden p-0'>
                 <CardContent className='grid p-0 md:grid-cols-2'>
-                    <form className='p-6 md:p-8'>
+                    <form className='p-6 md:p-8' onSubmit={handleSubmit}>
                         <div className='flex flex-col gap-6'>
                             <div className='flex flex-col items-center text-center'>
                                 <h1 className='text-2xl font-bold'>Welcome back</h1>
@@ -25,7 +35,14 @@ export function LoginForm({
                             </div>
                             <div className='grid gap-3'>
                                 <Label htmlFor='email'>Email</Label>
-                                <Input id='email' type='email' placeholder='m@example.com' required />
+                                <Input
+                                    id='email'
+                                    type='email'
+                                    placeholder='m@example.com'
+                                    required
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
                             </div>
                             <div className='grid gap-3'>
                                 <div className='flex items-center'>
@@ -34,7 +51,13 @@ export function LoginForm({
                                         Forgot your password?
                                     </a>
                                 </div>
-                                <Input id='password' type='password' required />
+                                <Input
+                                    id='password'
+                                    type='password'
+                                    required
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                />
                             </div>
                             <Button type='submit' className='w-full'>
                                 Login
