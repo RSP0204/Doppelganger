@@ -49,3 +49,4 @@ env/
 venv/
 
 .AI
+backend/userdata.json
