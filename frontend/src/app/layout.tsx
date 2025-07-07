@@ -33,8 +33,8 @@ const Layout = ({ children }: Readonly<{ children: ReactNode }>) => {
                 className={`${geistSans.variable} ${geistMono.variable} bg-background text-foreground overscroll-none antialiased`}>
                 <AuthProvider>
                     <ThemeProvider attribute='class'>
-                        {children}
                         <NavHeader />
+                        <main className="">{children}</main>
                         <Toaster />
                     </ThemeProvider>
                 </AuthProvider>

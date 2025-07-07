@@ -23,52 +23,54 @@ export function NavHeader() {
     const pathname = usePathname();
 
     return (
-        <nav className="fixed top-4 inset-x-0 max-w-screen-lg mx-auto flex items-center justify-between p-2 rounded-full bg-background/50 border border-border/40 shadow-inner">
-            <div className="flex items-center justify-center flex-1 gap-2">
-                {centerLinks.map((link) => {
-                    const isActive = pathname === link.href;
-                    
+        <nav className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-sm">
+            <div className="container flex items-center justify-between h-16">
+                <div className="flex items-center justify-center flex-1 gap-2">
+                    {centerLinks.map((link) => {
+                        const isActive = pathname === link.href;
+                        
 return (
-                        <Link
-                            key={link.href}
-                            href={link.href}
-                            className={cn(
-                                'relative flex items-center justify-center w-12 h-12 rounded-full text-foreground/60 hover:text-foreground transition-colors duration-300',
-                                isActive ? 'text-primary' : ''
-                            )}
-                        >
-                            {isActive && (
-                                <motion.div
-                                    layoutId="bubble"
-                                    className="absolute inset-0 bg-primary/20 rounded-full"
-                                    style={{ borderRadius: 9999 }}
-                                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                                />
-                            )}
-                            <link.icon className="w-6 h-6" />
-                        </Link>
-                    );
-                })}
-            </div>
-            <div className="flex items-center justify-end">
-                <Link
-                    key={rightLink.href}
-                    href={rightLink.href}
-                    className={cn(
-                        'relative flex items-center justify-center w-12 h-12 rounded-full text-foreground/60 hover:text-foreground transition-colors duration-300',
-                        pathname === rightLink.href ? 'text-primary' : ''
-                    )}
-                >
-                    {pathname === rightLink.href && (
-                        <motion.div
-                            layoutId="bubble"
-                            className="absolute inset-0 bg-primary/20 rounded-full"
-                            style={{ borderRadius: 9999 }}
-                            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                        />
-                    )}
-                    <rightLink.icon className="w-6 h-6" />
-                </Link>
+                            <Link
+                                key={link.href}
+                                href={link.href}
+                                className={cn(
+                                    'relative flex items-center justify-center w-12 h-12 rounded-full text-foreground/60 hover:text-foreground transition-colors duration-300',
+                                    isActive ? 'text-primary' : ''
+                                )}
+                            >
+                                {isActive && (
+                                    <motion.div
+                                        layoutId="bubble"
+                                        className="absolute inset-0 bg-primary/20 rounded-full"
+                                        style={{ borderRadius: 9999 }}
+                                        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                                    />
+                                )}
+                                <link.icon className="w-6 h-6" />
+                            </Link>
+                        );
+                    })}
+                </div>
+                <div className="flex items-center justify-end">
+                    <Link
+                        key={rightLink.href}
+                        href={rightLink.href}
+                        className={cn(
+                            'relative flex items-center justify-center w-12 h-12 rounded-full text-foreground/60 hover:text-foreground transition-colors duration-300',
+                            pathname === rightLink.href ? 'text-primary' : ''
+                        )}
+                    >
+                        {pathname === rightLink.href && (
+                            <motion.div
+                                layoutId="bubble"
+                                className="absolute inset-0 bg-primary/20 rounded-full"
+                                style={{ borderRadius: 9999 }}
+                                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                            />
+                        )}
+                        <rightLink.icon className="w-6 h-6" />
+                    </Link>
+                </div>
             </div>
         </nav>
     );
