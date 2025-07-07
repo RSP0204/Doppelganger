@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from backend.model_strategy import GeminiStrategy, MistralStrategy, AIModelStrategy
 
 load_dotenv()  # Load environment variables from .env file
+print(f"[Agent] GEMINI_API_KEY: {os.getenv('GEMINI_API_KEY')}")
 
 # --- Strategy Pattern Implementation ---
 # Configure which AI model strategy to use
