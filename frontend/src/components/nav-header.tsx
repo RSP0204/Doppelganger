@@ -66,11 +66,10 @@ return (
                     })}
                 </div>
                 <div className="flex items-center justify-end">
-                    <TooltipProvider>
+                    <TooltipProvider key={rightLink.href}>
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Link
-                                    key={rightLink.href}
                                     href={rightLink.href}
                                     className={cn(
                                         'relative flex items-center justify-center w-12 h-12 rounded-full text-foreground/60 hover:text-foreground transition-colors duration-300',
