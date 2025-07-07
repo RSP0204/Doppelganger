@@ -7,6 +7,7 @@ import {
     LogIn
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image'; // Import Image component
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -30,8 +31,22 @@ export function NavHeader() {
 
     return (
         <nav className="sticky top-0 z-50 w-full bg-[#446af8] backdrop-blur-sm">
-            <div className="container flex items-center justify-between h-16">
-                <div className="flex items-center justify-center flex-1 gap-2">
+            <div className="container flex items-center justify-between h-16 px-4"> {/* Added px-4 for spacing */}
+                {/* Left Section: Logo */}
+                <div className="flex items-center">
+                    <Link href="/">
+                        <Image
+                            src="/images/logo.png"
+                            alt="Doppelganger Logo"
+                            width={40} // Equisimetric size
+                            height={40} // Equisimetric size
+                            className="rounded-full"
+                        />
+                    </Link>
+                </div>
+
+                {/* Center Section: Navigation Links */}
+                <div className="flex flex-1 justify-center items-center gap-x-4"> {/* Added gap-x-4 for spacing */}
                     {centerLinks.map((link) => {
                         const isActive = pathname === link.href;
                         
@@ -65,7 +80,9 @@ return (
                         );
                     })}
                 </div>
-                <div className="flex items-center justify-end">
+
+                {/* Right Section: Login/Logout Button */}
+                <div className="flex items-center">
                     <TooltipProvider key={rightLink.href}>
                         <Tooltip>
                             <TooltipTrigger asChild>
