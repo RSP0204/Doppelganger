@@ -23,6 +23,7 @@ class GeminiStrategy(AIModelStrategy):
         api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
             raise ValueError("GEMINI_API_KEY not found in .env file or environment variables.")
+        print(f"[DEBUG] Using Gemini API Key (last 5 chars): *****{api_key[-5:]}")
 
         llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest", google_api_key=api_key)
         print("[GeminiStrategy] ChatGoogleGenerativeAI model initialized.")
