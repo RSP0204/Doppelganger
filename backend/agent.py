@@ -1,35 +1,24 @@
 import os
-from langchain_google_genai import ChatGoogleGenerativeAI
+# Commented out Gemini imports
+# from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from backend.prompts import PROMPT_TEMPLATES
 from dotenv import load_dotenv
+from backend.model_strategy import GeminiStrategy, MistralStrategy, AIModelStrategy
 
 load_dotenv()  # Load environment variables from .env file
 
+# --- Strategy Pattern Implementation ---
+# Configure which AI model strategy to use
+# To switch models, simply change the class assigned to CURRENT_MODEL_STRATEGY
+CURRENT_MODEL_STRATEGY: AIModelStrategy = MistralStrategy()
+# CURRENT_MODEL_STRATEGY: AIModelStrategy = GeminiStrategy() # Uncomment to switch back to Gemini
+
 def get_llm_chain(role: str) -> LLMChain:
-    """Initializes and returns a LangChain LLMChain for the given role."""
-    print(f"[Agent] Initializing LLMChain for role: {role}")
-    if role not in PROMPT_TEMPLATES:
-        print(f"[Agent] Error: Role '{role}' is not supported.")
-        raise ValueError(f"Role '{role}' is not supported.")
-
-    # Make sure to set your GOOGLE_API_KEY as an environment variable
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        print("[Agent] Error: GEMINI_API_KEY not found.")
-        raise ValueError("GEMINI_API_KEY not found in .env file or environment variables.")
-
-    llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest", google_api_key=api_key)
-    print("[Agent] ChatGoogleGenerativeAI model initialized.")
-
-    prompt_template = PromptTemplate(
-        template=PROMPT_TEMPLATES[role],
-        input_variables=["transcript_chunk"],
-    )
-    print("[Agent] PromptTemplate created.")
-
-    return LLMChain(llm=llm, prompt=prompt_template)
+    """Initializes and returns a LangChain LLMChain for the given role using the selected strategy."""
+    print(f"[Agent] Using strategy: {CURRENT_MODEL_STRATEGY.__class__.__name__}")
+    return CURRENT_MODEL_STRATEGY.get_llm_chain(role)
 
 def generate_dialogue(role: str, transcript_chunk: str) -> str:
     """Generates dialogue suggestions for a given role and transcript chunk."""
