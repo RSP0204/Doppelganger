@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react';
-
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
-
+import { AuthProvider } from '@/contexts/AuthContext';
 import { ThemeProvider } from 'next-themes';
 
 import NavHeader from '@/components/nav-header';
@@ -32,11 +31,13 @@ const Layout = ({ children }: Readonly<{ children: ReactNode }>) => {
         <html suppressHydrationWarning lang='en'>
             <body
                 className={`${geistSans.variable} ${geistMono.variable} bg-background text-foreground overscroll-none antialiased`}>
-                <ThemeProvider attribute='class'>
-                    {children}
-                    <NavHeader />
-                    <Toaster />
-                </ThemeProvider>
+                <AuthProvider>
+                    <ThemeProvider attribute='class'>
+                        {children}
+                        <NavHeader />
+                        <Toaster />
+                    </ThemeProvider>
+                </AuthProvider>
             </body>
         </html>
     );
