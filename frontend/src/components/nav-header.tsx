@@ -31,7 +31,8 @@ export function NavHeader() {
 
     return (
         <nav className="sticky top-0 z-50 w-full bg-[#446af8] backdrop-blur-sm">
-            <div className="container flex items-center justify-between h-16 px-4"> {/* Added px-4 for spacing */}
+            <div className="container mx-auto h-16 px-4 flex items-center justify-center">
+                <div className="flex items-center justify-between w-full">
                 {/* Left Section: Logo */}
                 <div className="flex items-center">
                     <Link href="/">
@@ -110,6 +111,7 @@ return (
                         </Tooltip>
                     </TooltipProvider>
                 </div>
+            </div>
             </div>
         </nav>
     );
