@@ -25,6 +25,6 @@ Your Response:
 
 # A dictionary to easily access the prompts by role
 PROMPT_TEMPLATES = {
-    "Business Analyst": BUSINESS_ANALYST_PROMPT,
-    "Startup Founder": STARTUP_FOUNDER_PROMPT,
+    "business-analyst": BUSINESS_ANALYST_PROMPT,
+    "startup-founder": STARTUP_FOUNDER_PROMPT,
 }

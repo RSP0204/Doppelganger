@@ -18,7 +18,7 @@ async def process_transcript(request: TranscriptRequest):
     This endpoint receives a transcript and a role, processes the transcript in chunks,
     and returns a list of AI-generated questions and statements for each chunk.
     """
-    print(f"[Backend] Received request to process transcript for role: {request.role}")
+    print(f"[Backend] Received request to process transcript. Role: '{request.role}', Transcript length: {len(request.transcript)} characters.")
 
     if not request.transcript:
         print("[Backend] Error: Transcript cannot be empty.")

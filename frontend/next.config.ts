@@ -25,6 +25,14 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+    async rewrites() {
+        return [
+            {
+                source: '/process-transcript',
+                destination: 'http://127.0.0.1:8000/process-transcript', // Proxy to your FastAPI backend
+            },
+        ];
+    },
 };
 
 export default withBundleAnalyzer(nextConfig);
