@@ -22,7 +22,8 @@ export default function TranscriptUploader() {
   const handleSubmit = async () => {
     if (!file || !role) {
       alert('Please select a file and a role.');
-      return;
+      
+return;
     }
 
     const formData = new FormData();

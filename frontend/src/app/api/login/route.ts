@@ -19,13 +19,16 @@ export async function POST(request: Request) {
 
     if (user) {
       console.log('Login successful for user:', username);
-      return NextResponse.json({ message: 'Login successful' });
+      
+return NextResponse.json({ message: 'Login successful' });
     } else {
       console.log('Invalid credentials for user:', username);
-      return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
+      
+return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
     }
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
+    
+return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }
 }

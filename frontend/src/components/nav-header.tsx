@@ -27,7 +27,8 @@ export function NavHeader() {
             <div className="flex items-center justify-center flex-1 gap-2">
                 {centerLinks.map((link) => {
                     const isActive = pathname === link.href;
-                    return (
+                    
+return (
                         <Link
                             key={link.href}
                             href={link.href}
