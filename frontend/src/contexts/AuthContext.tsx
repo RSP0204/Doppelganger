@@ -1,33 +1,47 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import Cookies from 'js-cookie';
+
 
 interface AuthContextType {
   isAuthenticated: boolean;
   login: () => void;
   logout: () => void;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return Cookies.get('isAuthenticated') === 'true';
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedAuth = localStorage.getItem('isAuthenticated');
+      if (storedAuth === 'true') {
+        setIsAuthenticated(true);
+      }
+      setLoading(false);
+    }
+  }, []);
 
   const login = () => {
     setIsAuthenticated(true);
-    Cookies.set('isAuthenticated', 'true', { expires: 7 }); // Cookie expires in 7 days
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('isAuthenticated', 'true');
+    }
   };
 
   const logout = () => {
     setIsAuthenticated(false);
-    Cookies.remove('isAuthenticated');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('isAuthenticated');
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

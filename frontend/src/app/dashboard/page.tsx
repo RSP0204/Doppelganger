@@ -7,14 +7,18 @@ import TranscriptUploader from '@/components/transcript-uploader';
 import ResultsDisplay from '@/components/results-display';
 
 export default function DashboardPage() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!loading && !isAuthenticated) {
       router.push('/login');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, loading, router]);
+
+  if (loading) {
+    return null; // Or a loading spinner
+  }
 
   if (!isAuthenticated) {
     return null;
