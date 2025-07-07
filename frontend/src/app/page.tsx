@@ -18,8 +18,8 @@ const Page = () => {
                         Your real-time AI meeting companion that helps you ask the right questions, uncover hidden insights, and make every conversation count.
                     </p>
                     <div className="mt-8 space-x-4">
-                        <Button size="lg" variant="secondary">Try It Free</Button>
-                        <Button size="lg" variant="outline">Book a Demo</Button>
+                        <Button size="lg" variant="gradient">Try It Free</Button>
+                        <Button size="lg" variant="gradient">Book a Demo</Button>
                     </div>
                 </section>
                 <HowItWorks />
