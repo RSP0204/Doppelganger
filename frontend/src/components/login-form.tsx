@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation'; // Import useRouter
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/registry/new-york-v4/ui/button';
@@ -14,13 +15,13 @@ export function LoginForm({
 }: React.ComponentProps<'div'> & {
     imageUrl?: string;
 }) {
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const router = useRouter(); // Initialize useRouter
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Login attempt with:', { email, password });
-        // Here you would typically send this data to your backend for authentication
+        console.log('handleSubmit triggered!');
     };
 
     return (
@@ -34,14 +35,14 @@ export function LoginForm({
                                 <p className='text-muted-foreground text-balance'>Login to your Acme Inc account</p>
                             </div>
                             <div className='grid gap-3'>
-                                <Label htmlFor='email'>Email</Label>
+                                <Label htmlFor='username'>Username</Label>
                                 <Input
-                                    id='email'
-                                    type='email'
-                                    placeholder='m@example.com'
+                                    id='username'
+                                    type='text'
+                                    placeholder='yourusername'
                                     required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
                                 />
                             </div>
                             <div className='grid gap-3'>
