@@ -33,10 +33,8 @@ const Layout = ({ children }: Readonly<{ children: ReactNode }>) => {
             <body
                 className={`${geistSans.variable} ${geistMono.variable} bg-background text-foreground overscroll-none antialiased`}>
                 <ThemeProvider attribute='class'>
-                    <header className="sticky top-0 z-50 w-full p-4">
-                        <div className="container flex h-14 items-center justify-center mx-auto bg-background/60 backdrop-blur-lg rounded-2xl border border-border/40">
-                            <NavHeader />
-                        </div>
+                    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                        <NavHeader />
                     </header>
                     {children}
                     <Toaster />
