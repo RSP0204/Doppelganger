@@ -49,7 +49,7 @@ return (
                                             {isActive && (
                                                 <motion.div
                                                     layoutId="bubble"
-                                                    className="absolute inset-0 bg-white rounded-full"
+                                                    className="absolute inset-0 bg-white/50 rounded-full"
                                                     style={{ borderRadius: 9999 }}
                                                     transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                                                 />
@@ -79,7 +79,7 @@ return (
                                     {pathname === rightLink.href && (
                                         <motion.div
                                             layoutId="bubble"
-                                            className="absolute inset-0 bg-white rounded-full"
+                                            className="absolute inset-0 bg-white/50 rounded-full"
                                             style={{ borderRadius: 9999 }}
                                             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                                         />
