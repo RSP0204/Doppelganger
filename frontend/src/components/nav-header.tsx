@@ -23,7 +23,7 @@ export function NavHeader() {
     const pathname = usePathname();
 
     return (
-        <nav className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-sm">
+        <nav className="sticky top-0 z-50 w-full bg-[#693efe] backdrop-blur-sm">
             <div className="container flex items-center justify-between h-16">
                 <div className="flex items-center justify-center flex-1 gap-2">
                     {centerLinks.map((link) => {
