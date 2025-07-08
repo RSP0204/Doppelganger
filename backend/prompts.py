@@ -7,8 +7,12 @@ Transcript:
 {transcript_chunk}
 
 Your Response:
-- Suggested Questions:
-
+```json
+{{"suggested_questions": [
+    "Question 1",
+    "Question 2"
+]}}
+```
 """
 
 STARTUP_FOUNDER_PROMPT = """
@@ -21,8 +25,12 @@ Transcript:
 {transcript_chunk}
 
 Your Response:
-- Suggested Questions:
-
+```json
+{{"suggested_questions": [
+    "Question 1",
+    "Question 2"
+]}}
+```
 """
 
 INVESTOR_PROMPT = """
@@ -34,8 +42,12 @@ Transcript:
 {transcript_chunk}
 
 Your Response:
-- Suggested Questions:
-
+```json
+{{"suggested_questions": [
+    "Question 1",
+    "Question 2"
+]}}
+```
 """
 
 INTERVIEWER_PROMPT = """
@@ -47,8 +59,12 @@ Transcript:
 {transcript_chunk}
 
 Your Response:
-- Suggested Questions:
-
+```json
+{{"suggested_questions": [
+    "Question 1",
+    "Question 2"
+]}}
+```
 """
 
 FRIEND_PROMPT = """
@@ -60,8 +76,12 @@ Transcript:
 {transcript_chunk}
 
 Your Response:
-- Suggested Questions:
-
+```json
+{{"suggested_questions": [
+    "Question 1",
+    "Question 2"
+]}}
+```
 """
 
 TECH_LEAD_PROMPT = """
@@ -73,8 +93,12 @@ Transcript:
 {transcript_chunk}
 
 Your Response:
-- Suggested Questions:
-
+```json
+{{"suggested_questions": [
+    "Question 1",
+    "Question 2"
+]}}
+```
 """
 
 # A dictionary to easily access the prompts by role

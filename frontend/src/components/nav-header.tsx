@@ -20,13 +20,29 @@ import {
     TooltipTrigger,
 } from '@/registry/new-york-v4/ui/tooltip';
 
-const centerLinks = [
+interface NavLink {
+    name: string;
+    href: string;
+    icon: any; // Using 'any' for simplicity, can be more specific if needed
+    onClick?: () => void; // Make onClick optional
+}
+
+
+
+interface NavLink {
+    name: string;
+    href: string;
+    icon: any; // Using 'any' for simplicity, can be more specific if needed
+    onClick?: () => void; // Make onClick optional
+}
+
+const centerLinks: NavLink[] = [
     { name: 'Home', href: '/', icon: Home },
     { name: 'About Us', href: '/about', icon: User },
     { name: 'Contact Us', href: '/contact', icon: Mail }
 ];
 
-const rightLink = { name: 'Log In', href: '/login', icon: LogIn };
+const rightLink: NavLink = { name: 'Log In', href: '/login', icon: LogIn };
 
 export function NavHeader() {
     const pathname = usePathname();
@@ -96,7 +112,7 @@ return (
                             <TooltipTrigger asChild>
                                 <Link
                                     href={currentRightLink.href}
-                                    onClick={currentRightLink.onClick}
+                                    {...(currentRightLink.onClick && { onClick: currentRightLink.onClick })}
                                     className={cn(
                                         'relative flex items-center justify-center w-12 h-12 rounded-full text-foreground/60 hover:text-foreground transition-colors duration-300',
                                         pathname === currentRightLink.href && currentRightLink.href !== '#' ? 'text-black' : ''

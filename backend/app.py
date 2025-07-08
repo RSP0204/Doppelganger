@@ -38,9 +38,9 @@ async def process_transcript(request: TranscriptRequest):
         generated_dialogues = []
         for i, chunk in enumerate(chunks):
             print(f"[Backend] Generating dialogue for chunk {i+1}/{len(chunks)}...")
-            dialogue = generate_dialogue(role=request.role, transcript_chunk=chunk)
-            generated_dialogues.append(dialogue)
-            print(f"[Backend] Generated dialogue for chunk {i+1}: {dialogue[:50]}...") # Log first 50 chars
+            dialogue_json = generate_dialogue(role=request.role, transcript_chunk=chunk)
+            generated_dialogues.append(dialogue_json)
+            print(f"[Backend] Generated dialogue for chunk {i+1}: {dialogue_json}")
 
         print("[Backend] All dialogues generated successfully. Returning response.")
         return {"generated_dialogues": generated_dialogues}

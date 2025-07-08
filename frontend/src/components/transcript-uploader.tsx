@@ -18,7 +18,7 @@ import Dropzone from './dropzone';
 
 //following is the structure for transcript uploder props
 interface TranscriptUploaderProps {
-  setGeneratedDialogues: (dialogues: string[]) => void;
+  setGeneratedDialogues: (dialogues: any[]) => void;
   setShowResults: (show: boolean) => void;
   setFileName: (name: string | null) => void;
   setFileContent: (content: string | null) => void;
