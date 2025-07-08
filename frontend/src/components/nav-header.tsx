@@ -4,8 +4,10 @@ import {
     Home,
     User,
     Mail,
-    LogIn
+    LogIn,
+    LogOut
 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import Image from 'next/image'; // Import Image component
 import { usePathname } from 'next/navigation';
@@ -28,6 +30,11 @@ const rightLink = { name: 'Log In', href: '/login', icon: LogIn };
 
 export function NavHeader() {
     const pathname = usePathname();
+    const { isAuthenticated, logout } = useAuth();
+
+    const currentRightLink = isAuthenticated
+        ? { name: 'Log Out', href: '#', icon: LogOut, onClick: logout }
+        : rightLink;
 
     return (
         <nav className="sticky top-0 z-50 w-full bg-[#446af8] backdrop-blur-sm">
@@ -84,17 +91,18 @@ return (
 
                 {/* Right Section: Login/Logout Button */}
                 <div className="flex items-center">
-                    <TooltipProvider key={rightLink.href}>
+                    <TooltipProvider key={currentRightLink.name}>
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Link
-                                    href={rightLink.href}
+                                    href={currentRightLink.href}
+                                    onClick={currentRightLink.onClick}
                                     className={cn(
                                         'relative flex items-center justify-center w-12 h-12 rounded-full text-foreground/60 hover:text-foreground transition-colors duration-300',
-                                        pathname === rightLink.href ? 'text-black' : ''
+                                        pathname === currentRightLink.href && currentRightLink.href !== '#' ? 'text-black' : ''
                                     )}
                                 >
-                                    {pathname === rightLink.href && (
+                                    {pathname === currentRightLink.href && currentRightLink.href !== '#' && (
                                         <motion.div
                                             layoutId="bubble"
                                             className="absolute inset-0 bg-white/50 rounded-full"
@@ -102,11 +110,11 @@ return (
                                             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                                         />
                                     )}
-                                    <rightLink.icon className="w-6 h-6" />
+                                    <currentRightLink.icon className="w-6 h-6" />
                                 </Link>
                             </TooltipTrigger>
                             <TooltipContent>
-                                <p>{rightLink.name}</p>
+                                <p>{currentRightLink.name}</p>
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
