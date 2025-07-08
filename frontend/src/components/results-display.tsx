@@ -91,6 +91,9 @@ export default function ResultsDisplay({ generatedDialogues }: { generatedDialog
           <h3 className="font-semibold text-left">Generated Dialogues:</h3>
           {generatedDialogues.map((dialogue, index) => {
             const parsed = parseDialogue(dialogue);
+            if (parsed.mainSections.length === 0) {
+              return null; // Don't render if there are no main sections
+            }
             return (
               <div key={index} className="mb-6 p-4 border rounded-md bg-gray-50">
                 {parsed.mainSections.map((mainSection, mainSecIndex) => (
