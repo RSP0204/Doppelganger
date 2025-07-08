@@ -7,7 +7,7 @@ import TranscriptUploader from '@/components/transcript-uploader';
 import ResultsDisplay from '@/components/results-display';
 
 export default function DashboardPage() {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, userId } = useAuth();
   const router = useRouter();
   const [generatedDialogues, setGeneratedDialogues] = useState<string[]>([]);
   const [showResults, setShowResults] = useState<boolean>(false);
@@ -39,6 +39,7 @@ export default function DashboardPage() {
             setFileName={setFileName}
             setFileContent={setFileContent}
             fileContent={fileContent}
+            userId={userId}
           />
         </div>
         <div className="md:col-span-2">

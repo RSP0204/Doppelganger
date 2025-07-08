@@ -3,9 +3,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-const LOCAL_STORAGE_TRANSCRIPT_KEY = 'uploadedTranscript';
-const LOCAL_STORAGE_FILE_NAME_KEY = 'uploadedFileName';
-const LOCAL_STORAGE_DIALOGUES_KEY = 'generatedDialogues';
+const LOCAL_STORAGE_TRANSCRIPT_KEY_PREFIX = 'uploadedTranscript_';
+const LOCAL_STORAGE_FILE_NAME_KEY_PREFIX = 'uploadedFileName_';
+const LOCAL_STORAGE_DIALOGUES_KEY_PREFIX = 'generatedDialogues_';
 import { Button } from '@/registry/new-york-v4/ui/button';
 import {
   Select,
@@ -23,31 +23,47 @@ interface TranscriptUploaderProps {
   setFileName: (name: string | null) => void;
   setFileContent: (content: string | null) => void;
   fileContent: string | null;
+  userId: string | null;
 }
 
-export default function TranscriptUploader({ setGeneratedDialogues, setShowResults, setFileName, setFileContent, fileContent }: TranscriptUploaderProps) {
+export default function TranscriptUploader({ setGeneratedDialogues, setShowResults, setFileName, setFileContent, fileContent, userId }: TranscriptUploaderProps) {
   const [file, setFile] = useState<File | null>(null);
   const [role, setRole] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    const savedDialogues = localStorage.getItem(LOCAL_STORAGE_DIALOGUES_KEY);
-    const savedFileName = localStorage.getItem(LOCAL_STORAGE_FILE_NAME_KEY);
-    const savedTranscript = localStorage.getItem(LOCAL_STORAGE_TRANSCRIPT_KEY);
+    if (!userId) return; // Don't load if no user is logged in
+
+    const userSpecificDialoguesKey = `${LOCAL_STORAGE_DIALOGUES_KEY_PREFIX}${userId}`;
+    const userSpecificFileNameKey = `${LOCAL_STORAGE_FILE_NAME_KEY_PREFIX}${userId}`;
+    const userSpecificTranscriptKey = `${LOCAL_STORAGE_TRANSCRIPT_KEY_PREFIX}${userId}`;
+
+    const savedDialogues = localStorage.getItem(userSpecificDialoguesKey);
+    const savedFileName = localStorage.getItem(userSpecificFileNameKey);
+    const savedTranscript = localStorage.getItem(userSpecificTranscriptKey);
 
     if (savedDialogues) {
       setGeneratedDialogues(JSON.parse(savedDialogues));
       setShowResults(true);
+    } else {
+      setGeneratedDialogues([]);
+      setShowResults(false);
     }
     if (savedFileName) {
       setFileName(savedFileName);
+    } else {
+      setFileName(null);
     }
     if (savedTranscript) {
       setFileContent(savedTranscript);
+    } else {
+      setFileContent(null);
     }
-  }, [setGeneratedDialogues, setShowResults, setFileName, setFileContent]);
+  }, [userId, setGeneratedDialogues, setShowResults, setFileName, setFileContent]);
 
   const handleFileDrop = useCallback((droppedFile: File) => {
+    if (!userId) return; // Cannot save without a user ID
+
     console.log('File dropped:', droppedFile.name);
     setFile(droppedFile);
     setFileName(droppedFile.name);
@@ -56,20 +72,20 @@ export default function TranscriptUploader({ setGeneratedDialogues, setShowResul
     reader.onload = (e) => {
       const content = e.target?.result as string;
       setFileContent(content);
-      localStorage.setItem(LOCAL_STORAGE_TRANSCRIPT_KEY, content);
-      localStorage.setItem(LOCAL_STORAGE_FILE_NAME_KEY, droppedFile.name);
-      // Clear previous results when a new file is dropped
-      localStorage.removeItem(LOCAL_STORAGE_DIALOGUES_KEY);
+      localStorage.setItem(`${LOCAL_STORAGE_TRANSCRIPT_KEY_PREFIX}${userId}`, content);
+      localStorage.setItem(`${LOCAL_STORAGE_FILE_NAME_KEY_PREFIX}${userId}`, droppedFile.name);
+      // Clear previous results for the current user when a new file is dropped
+      localStorage.removeItem(`${LOCAL_STORAGE_DIALOGUES_KEY_PREFIX}${userId}`);
       setGeneratedDialogues([]);
       setShowResults(false);
     };
     reader.readAsText(droppedFile);
-  }, [setFileName, setFileContent, setGeneratedDialogues, setShowResults]);
+  }, [setFileName, setFileContent, setGeneratedDialogues, setShowResults, userId]);
 
   const handleSubmit = async () => {
-    if (!file || !role) {
-      alert('Please select a file and a role.');
-      console.log('File or role not selected. File:', file, 'Role:', role);
+    if (!file || !role || !userId) {
+      alert('Please select a file, a role, and ensure you are logged in.');
+      console.log('File, role, or userId not selected. File:', file, 'Role:', role, 'UserId:', userId);
       return;
     }
 
@@ -97,7 +113,7 @@ export default function TranscriptUploader({ setGeneratedDialogues, setShowResul
           if (data) {
             const dialogues = Array.isArray(data.generated_dialogues) ? data.generated_dialogues : [];
             setGeneratedDialogues(dialogues);
-            localStorage.setItem(LOCAL_STORAGE_DIALOGUES_KEY, JSON.stringify(dialogues));
+            localStorage.setItem(`${LOCAL_STORAGE_DIALOGUES_KEY_PREFIX}${userId}`, JSON.stringify(dialogues));
             console.log('Generated dialogues set:', dialogues.length, 'items');
           } else {
             setGeneratedDialogues([]);
