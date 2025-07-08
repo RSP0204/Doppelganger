@@ -10,13 +10,16 @@ import {
   SelectValue,
 } from '@/registry/new-york-v4/ui/select';
 import Dropzone from './dropzone';
-import ResultsDisplay from './results-display';
 
-export default function TranscriptUploader() {
+
+interface TranscriptUploaderProps {
+  setGeneratedDialogues: (dialogues: string[]) => void;
+  setShowResults: (show: boolean) => void;
+}
+
+export default function TranscriptUploader({ setGeneratedDialogues, setShowResults }: TranscriptUploaderProps) {
   const [file, setFile] = useState<File | null>(null);
   const [role, setRole] = useState<string>('');
-  const [generatedDialogues, setGeneratedDialogues] = useState<string[]>([]);
-  const [showResults, setShowResults] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleFileDrop = (droppedFile: File) => {
@@ -80,9 +83,9 @@ export default function TranscriptUploader() {
   };
 
   return (
-    <div className="p-4 border rounded-lg">
+    <div className="p-4 border rounded-lg w-full flex flex-col items-center">
       <h2 className="text-xl font-semibold mb-4">Upload Transcript</h2>
-      <div className="space-y-4">
+      <div className="space-y-4 w-full flex flex-col items-center">
         <Dropzone onFileDrop={handleFileDrop} />
         <div>
           <label className="text-sm font-medium">Act as:</label>
@@ -100,9 +103,7 @@ export default function TranscriptUploader() {
           {isLoading ? 'Processing...' : 'Upload and Process'}
         </Button>
       </div>
-      {showResults && generatedDialogues && Array.isArray(generatedDialogues) && generatedDialogues.length > 0 && (
-        <ResultsDisplay generatedDialogues={generatedDialogues} />
-      )}
+      {/* Removed ResultsDisplay from here */}
     </div>
   );
 }

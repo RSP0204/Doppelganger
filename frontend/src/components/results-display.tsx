@@ -84,11 +84,11 @@ function parseDialogue(dialogue: string): ParsedDialogue {
 
 export default function ResultsDisplay({ generatedDialogues }: { generatedDialogues: string[] }) {
   return (
-    <div className="p-4 border rounded-lg mt-4">
-      <h2 className="text-xl font-semibold mb-4">Analysis Results</h2>
+    <div className="p-4 border rounded-lg w-full">
+      <h2 className="text-xl font-semibold mb-4 text-left">Analysis Results</h2>
       <div className="space-y-4">
         <div>
-          <h3 className="font-semibold">Generated Dialogues:</h3>
+          <h3 className="font-semibold text-left">Generated Dialogues:</h3>
           {generatedDialogues.map((dialogue, index) => {
             const parsed = parseDialogue(dialogue);
             return (

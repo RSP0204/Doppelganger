@@ -5,10 +5,13 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import TranscriptUploader from '@/components/transcript-uploader';
 import ResultsDisplay from '@/components/results-display';
+import { useState } from 'react';
 
 export default function DashboardPage() {
   const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
+  const [generatedDialogues, setGeneratedDialogues] = useState<string[]>([]);
+  const [showResults, setShowResults] = useState<boolean>(false);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -25,10 +28,17 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 flex flex-col items-center">
       <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <TranscriptUploader />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+        <div className="md:col-span-1 flex justify-center">
+          <TranscriptUploader setGeneratedDialogues={setGeneratedDialogues} setShowResults={setShowResults} />
+        </div>
+        <div className="md:col-span-2">
+          {showResults && generatedDialogues && Array.isArray(generatedDialogues) && generatedDialogues.length > 0 && (
+            <ResultsDisplay generatedDialogues={generatedDialogues} />
+          )}
+        </div>
       </div>
     </div>
   );
