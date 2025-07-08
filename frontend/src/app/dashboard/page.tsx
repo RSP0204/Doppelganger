@@ -43,7 +43,10 @@ export default function DashboardPage() {
         </div>
         <div className="md:col-span-2">
           {showResults && generatedDialogues && Array.isArray(generatedDialogues) && generatedDialogues.length > 0 && (
-            <ResultsDisplay generatedDialogues={generatedDialogues} />
+            <>
+              {console.log("Rendering ResultsDisplay. showResults:", showResults, "generatedDialogues length:", generatedDialogues.length)}
+              <ResultsDisplay generatedDialogues={generatedDialogues} />
+            </>
           )}
         </div>
       </div>

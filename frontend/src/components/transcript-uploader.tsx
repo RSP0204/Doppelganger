@@ -147,6 +147,10 @@ export default function TranscriptUploader({ setGeneratedDialogues, setShowResul
             <SelectContent>
               <SelectItem value="business-analyst">Business Analyst</SelectItem>
               <SelectItem value="startup-founder">Startup Founder</SelectItem>
+              <SelectItem value="investor">Investor</SelectItem>
+              <SelectItem value="interviewer">Interviewer</SelectItem>
+              <SelectItem value="friend">Friend</SelectItem>
+              <SelectItem value="tech-lead">Tech Lead</SelectItem>
             </SelectContent>
           </Select>
         </div>
