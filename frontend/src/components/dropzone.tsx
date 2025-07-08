@@ -6,15 +6,14 @@ import { UploadCloud } from 'lucide-react';
 
 interface DropzoneProps {
   onFileDrop: (file: File) => void;
+  fileName: string | null;
 }
 
-export default function Dropzone({ onFileDrop }: DropzoneProps) {
-  const [file, setFile] = useState<File | null>(null);
+export default function Dropzone({ onFileDrop, fileName }: DropzoneProps) {
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
       const acceptedFile = acceptedFiles[0];
-      setFile(acceptedFile);
       onFileDrop(acceptedFile);
     }
   }, [onFileDrop]);
@@ -36,8 +35,8 @@ export default function Dropzone({ onFileDrop }: DropzoneProps) {
     >
       <input {...getInputProps()} />
       <UploadCloud className="mx-auto h-12 w-12 text-gray-400" />
-      {file ? (
-        <p className="mt-2">Selected file: {file.name}</p>
+      {fileName ? (
+        <p className="mt-2">Selected file: {fileName}</p>
       ) : (
         <p className="mt-2">Drag & drop a .txt file here, or click to select a file</p>
       )}
