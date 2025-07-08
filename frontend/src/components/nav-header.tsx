@@ -48,7 +48,7 @@ export function NavHeader() {
     const pathname = usePathname();
     const { isAuthenticated, logout } = useAuth();
 
-    const currentRightLink = isAuthenticated
+    const currentRightLink = (pathname === '/dashboard' && isAuthenticated)
         ? { name: 'Log Out', href: '#', icon: LogOut, onClick: logout }
         : rightLink;
 
