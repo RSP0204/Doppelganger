@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 import os
 from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
 from backend.prompts import PROMPT_TEMPLATES
+from langchain_core.runnables import Runnable
 
 from langchain_google_genai import ChatGoogleGenerativeAI
 
@@ -11,11 +11,11 @@ from langchain_mistralai import ChatMistralAI
 
 class AIModelStrategy(ABC):
     @abstractmethod
-    def get_llm_chain(self, role: str) -> LLMChain:
+    def get_llm_chain(self, role: str) -> Runnable:
         pass
 
 class GeminiStrategy(AIModelStrategy):
-    def get_llm_chain(self, role: str) -> LLMChain:
+    def get_llm_chain(self, role: str) -> Runnable:
         print(f"[GeminiStrategy] Initializing LLMChain for role: {role}")
         if role not in PROMPT_TEMPLATES:
             raise ValueError(f"Role '{role}' is not supported.")
@@ -34,10 +34,10 @@ class GeminiStrategy(AIModelStrategy):
         )
         print("[GeminiStrategy] PromptTemplate created.")
 
-        return LLMChain(llm=llm, prompt=prompt_template)
+        return prompt_template | llm
 
 class MistralStrategy(AIModelStrategy):
-    def get_llm_chain(self, role: str) -> LLMChain:
+    def get_llm_chain(self, role: str) -> Runnable:
         print(f"[MistralStrategy] Initializing LLMChain for role: {role}")
         if role not in PROMPT_TEMPLATES:
             raise ValueError(f"Role '{role}' is not supported.")
@@ -56,4 +56,4 @@ class MistralStrategy(AIModelStrategy):
         )
         print("[MistralStrategy] PromptTemplate created.")
 
-        return LLMChain(llm=llm, prompt=prompt_template)
+        return prompt_template | llm

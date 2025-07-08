@@ -84,15 +84,18 @@ export default function TranscriptUploader() {
       <h2 className="text-xl font-semibold mb-4">Upload Transcript</h2>
       <div className="space-y-4">
         <Dropzone onFileDrop={handleFileDrop} />
-        <Select onValueChange={setRole}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select a role" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="business-analyst">Business Analyst</SelectItem>
-            <SelectItem value="startup-founder">Startup Founder</SelectItem>
-          </SelectContent>
-        </Select>
+        <div>
+          <label className="text-sm font-medium">Act as:</label>
+          <Select onValueChange={setRole}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="business-analyst">Business Analyst</SelectItem>
+              <SelectItem value="startup-founder">Startup Founder</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         <Button onClick={handleSubmit} disabled={isLoading}>
           {isLoading ? 'Processing...' : 'Upload and Process'}
         </Button>
