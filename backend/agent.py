@@ -25,5 +25,5 @@ def generate_dialogue(role: str, transcript_chunk: str) -> str:
     print(f"[Agent] Generating dialogue for role: {role} with chunk (first 50 chars): {transcript_chunk[:50]}...")
     llm_chain = get_llm_chain(role)
     response = llm_chain.run(transcript_chunk=transcript_chunk)
-    print(f"[Agent] Dialogue generation complete. Response (first 50 chars): {response[:50]}...")
+    print(f"[Agent] Dialogue generation complete. Full response: {response}")
     return response
