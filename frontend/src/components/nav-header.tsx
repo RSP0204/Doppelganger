@@ -53,7 +53,7 @@ export function NavHeader() {
         : rightLink;
 
     return (
-        <nav className="sticky top-0 z-50 w-full bg-[#446af8] backdrop-blur-sm">
+        <nav className="sticky top-0 z-50 w-full bg-[var(--navbar-background)] backdrop-blur-sm">
             <div className="container mx-auto h-16 px-4 flex items-center justify-center">
                 <div className="flex items-center justify-between w-full">
                 {/* Left Section: Logo */}
