@@ -39,13 +39,13 @@ export default function ResultsDisplay({ generatedDialogues }: { generatedDialog
             return (
               <div key={index} className="mb-6 p-4 border rounded-md bg-gray-50">
                 <h4 className="text-lg font-bold text-blue-700 mb-2">Suggested Questions:</h4>
-                <ul className="list-disc list-inside space-y-1">
+                <ol className="list-decimal list-inside space-y-1">
                   {questions.map((question: string, qIndex: number) => (
                     <li key={qIndex}>
                       <span className="font-medium">{question}</span>
                     </li>
                   ))}
-                </ul>
+                </ol>
               </div>
             );
           })}
