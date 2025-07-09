@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from backend.chunker import chunk_transcript
 from backend.agent import generate_dialogue
+import traceback
 
 # To run this app, use the following command in your terminal:
 # uvicorn backend.app:app --reload
@@ -50,6 +51,7 @@ async def process_transcript(request: TranscriptRequest):
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         print(f"[Backend] Unexpected error during processing: {e}")
+        print(traceback.format_exc())
         # Catch-all for any other unexpected errors
         raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
 
