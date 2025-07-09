@@ -217,3 +217,34 @@
   background-size: 400% 400%;
   animation: hero-gradient 15s ease infinite;
 }
+
+/* Custom Scrollbar Styles */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px; /* width of the scrollbar */
+  height: 8px; /* height of the horizontal scrollbar */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1; /* color of the tracking area */
+  border-radius: 0px; /* Make track square */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #888; /* color of the scroll thumb */
+  border-radius: 0px; /* Make thumb square */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #555; /* color of the scroll thumb on hover */
+}
+
+/* Hide scrollbar buttons (arrows) */
+.custom-scrollbar::-webkit-scrollbar-button {
+  display: none !important;
+}
+
+/* For Firefox */
+.custom-scrollbar {
+  scrollbar-width: thin; /* "auto" or "thin" */
+  scrollbar-color: #888 #f1f1f1; /* thumb color track color */
+}

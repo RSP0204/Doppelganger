@@ -162,7 +162,7 @@ export default function TranscriptUploader({ setGeneratedDialogues, setShowResul
           <div className="w-full">
             <label className="text-sm font-medium">File Content:</label>
             <textarea
-              className="w-full p-2 border rounded-md bg-gray-100 text-gray-800"
+              className="w-full p-2 border rounded-md bg-gray-100 text-gray-800 custom-scrollbar"
               rows={10}
               readOnly
               value={fileContent}
