@@ -55,9 +55,9 @@ export function NavHeader() {
     return (
         <nav className="sticky top-0 z-50 w-full bg-[var(--navbar-background)] backdrop-blur-sm">
             <div className="container mx-auto h-16 px-4 flex items-center justify-center">
-                <div className="flex items-center justify-between w-full">
+                <div className="grid grid-cols-3 w-full items-center">
                 {/* Left Section: Logo */}
-                <div className="flex items-center">
+                <div className="flex items-center justify-start">
                     <Link href="/" className="flex items-center space-x-2">
                         <Image
                             src="/images/logo.png"
@@ -71,7 +71,7 @@ export function NavHeader() {
                 </div>
 
                 {/* Center Section: Navigation Links */}
-                <div className="flex flex-1 justify-center items-center gap-x-4"> {/* Added gap-x-4 for spacing */}
+                <div className="flex justify-center items-center gap-x-4"> {/* Added gap-x-4 for spacing */}
                     {centerLinks.map((link) => {
                         const isActive = pathname === link.href;
                         
@@ -107,7 +107,7 @@ return (
                 </div>
 
                 {/* Right Section: Login/Logout Button */}
-                <div className="flex items-center">
+                <div className="flex items-center justify-end">
                     <TooltipProvider key={currentRightLink.name}>
                         <Tooltip>
                             <TooltipTrigger asChild>
