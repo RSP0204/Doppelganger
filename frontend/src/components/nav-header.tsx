@@ -58,7 +58,7 @@ export function NavHeader() {
                 <div className="flex items-center justify-between w-full">
                 {/* Left Section: Logo */}
                 <div className="flex items-center">
-                    <Link href="/">
+                    <Link href="/" className="flex items-center space-x-2">
                         <Image
                             src="/images/logo.png"
                             alt="Doppelganger Logo"
@@ -66,6 +66,7 @@ export function NavHeader() {
                             height={40} // Equisimetric size
                             className="rounded-full"
                         />
+                        <span className="font-bold text-white text-lg">Doppelganger</span>
                     </Link>
                 </div>
 
