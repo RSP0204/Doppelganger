@@ -1,6 +1,6 @@
 const CustomerTestimonials = () => {
     return (
-        <section className="py-20 text-center bg-gradient-to-r from-blue-100 to-blue-200">
+        <section className="py-20 text-center bg-white">
             <h2 className="text-3xl font-bold">What Our Customers Say</h2>
             <div className="flex justify-center mt-8 space-x-8 px-4">
                 <div className="p-8 bg-white rounded-lg shadow-lg">

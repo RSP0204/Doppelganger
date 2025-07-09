@@ -1,7 +1,7 @@
-
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Loader from './loader';
 
 const LOCAL_STORAGE_TRANSCRIPT_KEY_PREFIX = 'uploadedTranscript_';
 const LOCAL_STORAGE_FILE_NAME_KEY_PREFIX = 'uploadedFileName_';
@@ -82,6 +82,21 @@ export default function TranscriptUploader({ setGeneratedDialogues, setShowResul
     reader.readAsText(droppedFile);
   }, [setFileName, setFileContent, setGeneratedDialogues, setShowResults, userId]);
 
+  const handleFileRemove = useCallback(() => {
+    if (!userId) return;
+
+    setFile(null);
+    setFileName(null);
+    setFileContent(null);
+
+    localStorage.removeItem(`${LOCAL_STORAGE_TRANSCRIPT_KEY_PREFIX}${userId}`);
+    localStorage.removeItem(`${LOCAL_STORAGE_FILE_NAME_KEY_PREFIX}${userId}`);
+    localStorage.removeItem(`${LOCAL_STORAGE_DIALOGUES_KEY_PREFIX}${userId}`);
+
+    setGeneratedDialogues([]);
+    setShowResults(false);
+  }, [userId, setFileName, setFileContent, setGeneratedDialogues, setShowResults]);
+
   const handleSubmit = async () => {
     if (!file || !role || !userId) {
       alert('Please select a file, a role, and ensure you are logged in.');
@@ -142,7 +157,7 @@ export default function TranscriptUploader({ setGeneratedDialogues, setShowResul
     <div className="p-4 border rounded-lg w-full flex flex-col items-center">
       <h2 className="text-xl font-semibold mb-4">Upload Transcript</h2>
       <div className="space-y-4 w-full flex flex-col items-center">
-        <Dropzone onFileDrop={handleFileDrop} fileName={file?.name || null} />
+        <Dropzone onFileDrop={handleFileDrop} onFileRemove={handleFileRemove} fileName={file?.name || null} />
         {fileContent && (
           <div className="w-full">
             <label className="text-sm font-medium">File Content:</label>
@@ -171,7 +186,7 @@ export default function TranscriptUploader({ setGeneratedDialogues, setShowResul
           </Select>
         </div>
         <Button onClick={handleSubmit} disabled={isLoading}>
-          {isLoading ? 'Processing...' : 'Upload and Process'}
+          {isLoading ? <Loader /> : 'Upload and Process'}
         </Button>
       </div>
       {/* Removed ResultsDisplay from here */}

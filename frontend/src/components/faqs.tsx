@@ -7,7 +7,7 @@ import {
 
 const Faqs = () => {
     return (
-        <section className="py-20 text-center">
+        <section className="py-20 text-center bg-white">
             <h2 className="text-3xl font-bold">Frequently Asked Questions</h2>
             <div className="w-full max-w-4xl mx-auto mt-8">
                 <Accordion type="single" collapsible>
