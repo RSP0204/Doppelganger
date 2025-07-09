@@ -19,14 +19,14 @@ The AI should analyze the transcript in chunks and maintain the context througho
 ⸻
 
 2. Goals
- • Build a backend system that:
+ Build a backend system that:
  • Accepts a transcript file (text or JSON format).
  • Chunks the transcript into manageable sizes (~1000 tokens per chunk).
  • Sequentially processes chunks using LangChain and Gemini Pro API.
- • Generates role-specific:
+ Generates role-specific:
  • Follow-up questions.
  • Relevant statements to drive the conversation forward.
- • Build a simple frontend interface to:
+ Build a simple frontend interface to:
  • Upload transcripts.
  • Select the role/persona (e.g., Business Analyst, Founder).
  • Display the AI’s generated questions/statements.
@@ -50,14 +50,14 @@ Product User Upload transcripts and select AI roles I can get tailored conversat
  • Chunk transcript into manageable segments (~1000 tokens per chunk).
 
 4.2. AI Processing Engine
- • Use LangChain Sequential Chain or Map-Reduce Chain to:
+ Use LangChain Sequential Chain or Map-Reduce Chain to:
  • Analyze each chunk.
  • Generate context-specific questions/statements.
  • Maintain the AI’s persona via system prompts.
  • Integrate with Google Gemini Pro API via API Key (programmatic access).
 
 4.3. Role Management
- • Supported roles:
+ Supported roles:
  • Business Analyst
  • Startup Founder
  • Role-specific prompt templates must guide the AI behavior.
@@ -65,7 +65,7 @@ Product User Upload transcripts and select AI roles I can get tailored conversat
 4.4. Frontend Interface
  • File upload functionality.
  • Role selection dropdown.
- • Display area for AI-generated:
+ Display area for AI-generated:
  • Questions.
  • Statements.
 
