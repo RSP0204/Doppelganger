@@ -40,3 +40,22 @@ def generate_dialogue(role: str, transcript_chunk: str) -> dict:
         print(f"[Agent] Error decoding JSON from LLM response: {e}")
         print(f"[Agent] Raw LLM response content: {response.content}")
         return {"error": "Invalid JSON response from LLM", "details": str(e), "raw_response": response.content}
+
+def process_with_llm(transcribed_text: str, role: str) -> list[str]:
+    """Processes transcribed text with the LLM to generate three follow-up questions."""
+    print(f"[Agent] Processing with LLM for role: {role} with text (first 50 chars): {transcribed_text[:50]}...")
+    llm_chain = get_llm_chain(role) # Use role for prompt selection
+    response = llm_chain.invoke({'transcript_chunk': transcribed_text})
+    print(f"[Agent] LLM processing complete. Full response: {response}")
+    try:
+        json_match = re.search(r'```json\n(.*?)```', response.content, re.DOTALL)
+        if json_match:
+            json_string = json_match.group(1).strip()
+            data = json.loads(json_string)
+            return data.get("suggested_questions", [])
+        else:
+            raise ValueError("No JSON markdown block found in LLM response.")
+    except (json.JSONDecodeError, ValueError) as e:
+        print(f"[Agent] Error decoding JSON from LLM response: {e}")
+        print(f"[Agent] Raw LLM response content: {response.content}")
+        return []

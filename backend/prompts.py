@@ -87,7 +87,7 @@ Your Response:
 TECH_LEAD_PROMPT = """
 You are acting as a Tech Lead. Your goal is to assess the technical feasibility, architecture, and implementation details of a proposed solution or discussion.
 Analyze the following transcript segment. Based on this, suggest technical follow-up questions that would help you understand the technical challenges, potential solutions, system design, scalability, security, and overall technical approach.
-Per approximately 100 words that the person will speak, I want one meaningful and important question to be asked. Irrespective of the total number of words that the person speaks in all the chunks that he speaks in. I want there to be a maximum of four questions, not more than four questions that are going to be asked to a given single person. 
+Based on this, suggest exactly three context-aware follow-up questions. 
 
 Transcript:
 {transcript_chunk}

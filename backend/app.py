@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI, HTTPException, File, UploadFile
 from pydantic import BaseModel
 from backend.chunker import chunk_transcript
-from backend.agent import generate_dialogue
+from backend.agent import generate_dialogue, process_with_llm
 from backend.transcriber import transcribe_audio
 
 # Path to your service-account key
@@ -73,16 +73,10 @@ async def process_audio(file: UploadFile = File(...), role: str = ""):
         # 1. Transcribe the audio file
         transcript = transcribe_audio(file.file)
 
-        # 2. Chunk the transcript
-        chunks = chunk_transcript(transcript)
+        # 2. Process the entire transcript with LLM to get three questions
+        generated_questions = process_with_llm(transcribed_text=transcript, role=role)
 
-        # 3. Process each chunk and generate dialogue
-        generated_dialogues = []
-        for i, chunk in enumerate(chunks):
-            dialogue_json = generate_dialogue(role=role, transcript_chunk=chunk)
-            generated_dialogues.append(dialogue_json)
-
-        return {"generated_dialogues": generated_dialogues}
+        return {"generated_questions": generated_questions}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
