@@ -23,6 +23,8 @@ export default function Dropzone({ onFileDrop, onFileRemove, fileName }: Dropzon
     onDrop,
     accept: {
       'text/plain': ['.txt'],
+      'audio/wav': ['.wav'],
+      'audio/flac': ['.flac'],
     },
     multiple: false,
   });
@@ -52,9 +54,9 @@ export default function Dropzone({ onFileDrop, onFileRemove, fileName }: Dropzon
           </button>
         </div>
       ) : (
-        <p className="mt-2">Drag & drop a .txt file here, or click to select a file</p>
+        <p className="mt-2">Drag & drop a .txt, .wav, or .flac file here, or click to select a file</p>
       )}
-      <p className="text-xs text-gray-500 mt-1">Supported file type: TXT</p>
+      <p className="text-xs text-gray-500 mt-1">Supported file types: TXT, WAV, FLAC</p>
     </div>
   );
 }
