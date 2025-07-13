@@ -68,18 +68,22 @@ export default function TranscriptUploader({ setGeneratedDialogues, setShowResul
     setFile(droppedFile);
     setFileName(droppedFile.name);
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const content = e.target?.result as string;
-      setFileContent(content);
-      localStorage.setItem(`${LOCAL_STORAGE_TRANSCRIPT_KEY_PREFIX}${userId}`, content);
-      localStorage.setItem(`${LOCAL_STORAGE_FILE_NAME_KEY_PREFIX}${userId}`, droppedFile.name);
-      // Clear previous results for the current user when a new file is dropped
-      localStorage.removeItem(`${LOCAL_STORAGE_DIALOGUES_KEY_PREFIX}${userId}`);
-      setGeneratedDialogues([]);
-      setShowResults(false);
-    };
-    reader.readAsText(droppedFile);
+    if (droppedFile.type.startsWith('audio/')) {
+      setFileContent('Audio file loaded: ' + droppedFile.name);
+    } else {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target?.result as string;
+        setFileContent(content);
+        localStorage.setItem(`${LOCAL_STORAGE_TRANSCRIPT_KEY_PREFIX}${userId}`, content);
+        localStorage.setItem(`${LOCAL_STORAGE_FILE_NAME_KEY_PREFIX}${userId}`, droppedFile.name);
+        // Clear previous results for the current user when a new file is dropped
+        localStorage.removeItem(`${LOCAL_STORAGE_DIALOGUES_KEY_PREFIX}${userId}`);
+        setGeneratedDialogues([]);
+        setShowResults(false);
+      };
+      reader.readAsDataURL(droppedFile);
+    }
   }, [setFileName, setFileContent, setGeneratedDialogues, setShowResults, userId]);
 
   const handleFileRemove = useCallback(() => {
@@ -108,49 +112,86 @@ export default function TranscriptUploader({ setGeneratedDialogues, setShowResul
 
     setIsLoading(true); // Set loading to true
 
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const transcriptText = e.target?.result as string;
+    if (file.type.startsWith('audio/')) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('role', role);
+
+      // Log FormData contents for debugging
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
 
       try {
-        console.log('Sending transcript to backend:', { transcript: transcriptText.substring(0, 100) + '...', role });
-        const res = await fetch('/process-transcript', {
+        const res = await fetch('/process-audio', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ transcript: transcriptText, role }),
+          body: formData,
         });
 
         if (res.ok) {
           const data = await res.json();
-          console.log('Backend response received:', data);
           if (data) {
             const dialogues = Array.isArray(data.generated_dialogues) ? data.generated_dialogues : [];
             setGeneratedDialogues(dialogues);
             localStorage.setItem(`${LOCAL_STORAGE_DIALOGUES_KEY_PREFIX}${userId}`, JSON.stringify(dialogues));
-            console.log('Generated dialogues set:', dialogues.length, 'items');
           } else {
             setGeneratedDialogues([]);
-            console.log('No data received from backend.');
           }
           setShowResults(true);
-          console.log('Showing results.');
         } else {
-          console.error('File upload failed with status:', res.status, res.statusText);
           setShowResults(false);
-          console.log('Not showing results.');
         }
       } catch (error) {
-        console.error('An error occurred during transcript processing:', error);
+        console.error('An error occurred during audio processing:', error);
         setShowResults(false);
-        console.log('Not showing results due to error.');
       } finally {
-        setIsLoading(false); // Set loading to false regardless of success or failure
-        console.log('Loading state set to false.');
+        setIsLoading(false);
       }
-    };
-    reader.readAsText(file);
+    } else {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const transcriptText = e.target?.result as string;
+
+        try {
+          console.log('Sending transcript to backend:', { transcript: transcriptText.substring(0, 100) + '...', role });
+          const res = await fetch('/process-transcript', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ transcript: transcriptText, role }),
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            console.log('Backend response received:', data);
+            if (data) {
+              const dialogues = Array.isArray(data.generated_dialogues) ? data.generated_dialogues : [];
+              setGeneratedDialogues(dialogues);
+              localStorage.setItem(`${LOCAL_STORAGE_DIALOGUES_KEY_PREFIX}${userId}`, JSON.stringify(dialogues));
+              console.log('Generated dialogues set:', dialogues.length, 'items');
+            } else {
+              setGeneratedDialogues([]);
+              console.log('No data received from backend.');
+            }
+            setShowResults(true);
+            console.log('Showing results.');
+          } else {
+            console.error('File upload failed with status:', res.status, res.statusText);
+            setShowResults(false);
+            console.log('Not showing results.');
+          }
+        } catch (error) {
+          console.error('An error occurred during transcript processing:', error);
+          setShowResults(false);
+          console.log('Not showing results due to error.');
+        } finally {
+          setIsLoading(false); // Set loading to false regardless of success or failure
+          console.log('Loading state set to false.');
+        }
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (

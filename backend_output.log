@@ -1,0 +1,43 @@
+INFO:     Will watch for changes in these directories: ['C:\\Users\\RichaSingh\\Doppelganger']
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [25816] using StatReload
+[Agent] GEMINI_API_KEY: AIzaSyD_82wA6gljsg2Wa10Yar4CYlqxa2P1UlM
+INFO:     Started server process [4252]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+[Backend] Received audio file: dialog-memory_wav.wav, Role: 'friend'
+[Backend] Attempting to transcribe audio...
+[Transcriber] SpeechClient initialized.
+[Transcriber] Starting to generate audio chunks...
+[Transcriber] Finished generating audio chunks.
+[Transcriber] Audio content length: 6254670 bytes.
+[Transcriber] RecognitionAudio created.
+[Transcriber] RecognitionConfig created.
+[Transcriber] Calling client.recognize...
+[Transcriber] Error during Google Cloud Speech-to-Text API call: 400 sample_rate_hertz (16000) in RecognitionConfig must either be omitted or match the value in the WAV header (48000).
+[Backend] Error during audio transcription: 400 sample_rate_hertz (16000) in RecognitionConfig must either be omitted or match the value in the WAV header (48000).
+INFO:     127.0.0.1:60346 - "POST /process-audio HTTP/1.1" 500 Internal Server Error
+[Backend] Received audio file: dialog-memory_wav.wav, Role: 'friend'
+[Backend] Attempting to transcribe audio...
+[Transcriber] SpeechClient initialized.
+[Transcriber] Starting to generate audio chunks...
+[Transcriber] Finished generating audio chunks.
+[Transcriber] Audio content length: 6254670 bytes.
+[Transcriber] RecognitionAudio created.
+[Transcriber] RecognitionConfig created.
+[Transcriber] Calling client.recognize...
+[Transcriber] Error during Google Cloud Speech-to-Text API call: 400 sample_rate_hertz (16000) in RecognitionConfig must either be omitted or match the value in the WAV header (48000).
+[Backend] Error during audio transcription: 400 sample_rate_hertz (16000) in RecognitionConfig must either be omitted or match the value in the WAV header (48000).
+INFO:     127.0.0.1:60358 - "POST /process-audio HTTP/1.1" 500 Internal Server Error
+[Backend] Received audio file: dialog-memory_wav.wav, Role: 'friend'
+[Backend] Attempting to transcribe audio...
+[Transcriber] SpeechClient initialized.
+[Transcriber] Starting to generate audio chunks...
+[Transcriber] Finished generating audio chunks.
+[Transcriber] Audio content length: 6254670 bytes.
+[Transcriber] RecognitionAudio created.
+[Transcriber] RecognitionConfig created.
+[Transcriber] Calling client.recognize...
+[Transcriber] Error during Google Cloud Speech-to-Text API call: 400 sample_rate_hertz (16000) in RecognitionConfig must either be omitted or match the value in the WAV header (48000).
+[Backend] Error during audio transcription: 400 sample_rate_hertz (16000) in RecognitionConfig must either be omitted or match the value in the WAV header (48000).
+INFO:     127.0.0.1:60364 - "POST /process-audio HTTP/1.1" 500 Internal Server Error

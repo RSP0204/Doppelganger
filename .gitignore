@@ -54,3 +54,4 @@ venv/
 
 .AI
 backend/userdata.json
+service-account.json

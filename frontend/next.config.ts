@@ -31,8 +31,17 @@ const nextConfig: NextConfig = {
                 source: '/process-transcript',
                 destination: 'http://127.0.0.1:8000/process-transcript', // Proxy to your FastAPI backend
             },
+            {
+                source: '/process-audio',
+                destination: 'http://127.0.0.1:8000/process-audio', // Proxy to your FastAPI backend
+            },
         ];
     },
+    api: {
+        bodyParser: { 
+            sizeLimit: '10mb' 
+        }
+    }
 };
 
 export default withBundleAnalyzer(nextConfig);
