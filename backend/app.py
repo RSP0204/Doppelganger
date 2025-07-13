@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI, HTTPException, File, UploadFile
+from fastapi import FastAPI, HTTPException, File, UploadFile, Form
 from pydantic import BaseModel
 from backend.chunker import chunk_transcript
 from backend.agent import generate_dialogue, process_with_llm
@@ -59,27 +59,35 @@ async def process_transcript(request: TranscriptRequest):
         raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
 
 @app.post("/process-audio")
-async def process_audio(file: UploadFile = File(...), role: str = ""):
+async def process_audio(file: UploadFile = File(...), role: str = Form(...)):
+    print(f"[Backend] Received audio file: {file.filename}, Role: '{role}'")
     """
     This endpoint receives an audio file, transcribes it, processes the transcript in chunks,
     and returns a list of AI-generated questions and statements for each chunk.
     """
     if not file:
+        print("[Backend] Error: File cannot be empty.")
         raise HTTPException(status_code=400, detail="File cannot be empty.")
     if not role:
+        print("[Backend] Error: Role cannot be empty.")
         raise HTTPException(status_code=400, detail="Role cannot be empty.")
 
     try:
-        # 1. Transcribe the audio file
+        print("[Backend] Attempting to transcribe audio...")
         transcript = transcribe_audio(file.file)
-
-        # 2. Process the entire transcript with LLM to get three questions
-        generated_questions = process_with_llm(transcribed_text=transcript, role=role)
-
-        return {"generated_questions": generated_questions}
-
+        print(f"[Backend] Audio transcribed. Transcript length: {len(transcript)} characters.")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
+        print(f"[Backend] Error during audio transcription: {e}")
+        raise HTTPException(status_code=500, detail=f"Audio transcription failed: {str(e)}")
+
+    try:
+        print("[Backend] Attempting to process transcript with LLM...")
+        generated_questions = process_with_llm(transcribed_text=transcript, role=role)
+        print("[Backend] LLM processing complete.")
+        return {"generated_questions": generated_questions}
+    except Exception as e:
+        print(f"[Backend] Error during LLM processing: {e}")
+        raise HTTPException(status_code=500, detail=f"LLM processing failed: {str(e)}")
 
 @app.get("/")
 async def root():
