@@ -1,4 +1,5 @@
 import os
+import tempfile
 from fastapi import FastAPI, HTTPException, File, UploadFile, Form
 from pydantic import BaseModel
 from backend.chunker import chunk_transcript
@@ -73,18 +74,29 @@ async def process_audio(file: UploadFile = File(...), role: str = Form(...)):
         raise HTTPException(status_code=400, detail="Role cannot be empty.")
 
     try:
+        # Create a temporary file to store the uploaded audio
+        with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1]) as temp_audio_file:
+            content = await file.read()
+            temp_audio_file.write(content)
+            temp_audio_file_path = temp_audio_file.name
+
         print("[Backend] Attempting to transcribe audio...")
-        transcript = transcribe_audio(file.file)
+        transcript = transcribe_audio(temp_audio_file_path)
         print(f"[Backend] Audio transcribed. Transcript length: {len(transcript)} characters.")
+
     except Exception as e:
         print(f"[Backend] Error during audio transcription: {e}")
         raise HTTPException(status_code=500, detail=f"Audio transcription failed: {str(e)}")
+    finally:
+        # Clean up the temporary file
+        if 'temp_audio_file_path' in locals() and os.path.exists(temp_audio_file_path):
+            os.remove(temp_audio_file_path)
 
     try:
         print("[Backend] Attempting to process transcript with LLM...")
-        generated_questions = process_with_llm(transcribed_text=transcript, role=role)
+        generated_dialogues = process_with_llm(transcribed_text=transcript, role=role)
         print("[Backend] LLM processing complete.")
-        return {"generated_questions": generated_questions}
+        return {"generated_dialogues": generated_dialogues}
     except Exception as e:
         print(f"[Backend] Error during LLM processing: {e}")
         raise HTTPException(status_code=500, detail=f"LLM processing failed: {str(e)}")
