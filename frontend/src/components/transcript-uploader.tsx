@@ -82,7 +82,11 @@ export default function TranscriptUploader({ setGeneratedDialogues, setShowResul
         setGeneratedDialogues([]);
         setShowResults(false);
       };
-      reader.readAsDataURL(droppedFile);
+      if (droppedFile.type === 'text/plain') {
+        reader.readAsText(droppedFile);
+      } else {
+        reader.readAsDataURL(droppedFile);
+      }
     }
   }, [setFileName, setFileContent, setGeneratedDialogues, setShowResults, userId]);
 
@@ -190,7 +194,11 @@ export default function TranscriptUploader({ setGeneratedDialogues, setShowResul
           console.log('Loading state set to false.');
         }
       };
-      reader.readAsDataURL(file);
+      if (file.type === 'text/plain') {
+        reader.readAsText(file);
+      } else {
+        reader.readAsDataURL(file);
+      }
     }
   };
 
