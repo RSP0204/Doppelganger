@@ -75,10 +75,11 @@ async def process_audio(file: UploadFile = File(...), role: str = Form(...)):
         raise HTTPException(status_code=400, detail="Role cannot be empty.")
 
     try:
-        # Create a temporary file to store the uploaded audio
+        # Create a temporary file to store the uploaded audio.
+        # The file is read in chunks to avoid memory issues with large files.
         with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1]) as temp_audio_file:
-            content = await file.read()
-            temp_audio_file.write(content)
+            while content := await file.read(1024 * 1024):  # Read in 1MB chunks
+                temp_audio_file.write(content)
             temp_audio_file_path = temp_audio_file.name
 
         print("[Backend] Attempting to transcribe audio...")

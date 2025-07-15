@@ -36,11 +36,6 @@ const nextConfig: NextConfig = {
                 destination: 'http://127.0.0.1:8000/process-audio', // Proxy to your FastAPI backend
             },
         ];
-    },
-    api: {
-        bodyParser: { 
-            sizeLimit: '10mb' 
-        }
     }
 };
 
