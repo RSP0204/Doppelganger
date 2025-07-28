@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from backend.chunker import chunk_transcript
 from backend.agent import generate_dialogue, process_with_llm
 from backend.transcriber import transcribe_audio
+from backend.document_processing import read_docx
 
 # Path to your service-account key
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "service-account.json"
@@ -95,6 +96,52 @@ async def process_audio(file: UploadFile = File(...), role: str = Form(...)):
     try:
         print("[Backend] Attempting to process transcript with LLM...")
         generated_dialogues = process_with_llm(transcribed_text=transcript, role=role)
+        print("[Backend] LLM processing complete.")
+        return {"generated_dialogues": generated_dialogues}
+    except Exception as e:
+        print(f"[Backend] Error during LLM processing: {e}")
+        raise HTTPException(status_code=500, detail=f"LLM processing failed: {str(e)}")
+
+@app.post("/process-document")
+async def process_document(file: UploadFile = File(...), role: str = Form(...)):
+    print(f"[Backend] Received document: {file.filename}, Role: '{role}'")
+    """
+    This endpoint receives a .docx file, extracts the text, processes it,
+    and returns a list of AI-generated questions and statements.
+    """
+    if not file:
+        print("[Backend] Error: File cannot be empty.")
+        raise HTTPException(status_code=400, detail="File cannot be empty.")
+    if not role:
+        print("[Backend] Error: Role cannot be empty.")
+        raise HTTPException(status_code=400, detail="Role cannot be empty.")
+
+    # Check for allowed file extension
+    if not file.filename.endswith(".docx"):
+        raise HTTPException(status_code=400, detail="Invalid file type. Only .docx files are accepted.")
+
+    try:
+        # Create a temporary file to store the uploaded document
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".docx") as temp_doc_file:
+            content = await file.read()
+            temp_doc_file.write(content)
+            temp_doc_file_path = temp_doc_file.name
+
+        print("[Backend] Attempting to read .docx file...")
+        document_text = read_docx(temp_doc_file_path)
+        print(f"[Backend] .docx file read. Text length: {len(document_text)} characters.")
+
+    except Exception as e:
+        print(f"[Backend] Error during .docx processing: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to process .docx file: {str(e)}")
+    finally:
+        # Clean up the temporary file
+        if 'temp_doc_file_path' in locals() and os.path.exists(temp_doc_file_path):
+            os.remove(temp_doc_file_path)
+
+    try:
+        print("[Backend] Attempting to process document text with LLM...")
+        generated_dialogues = process_with_llm(transcribed_text=document_text, role=role)
         print("[Backend] LLM processing complete.")
         return {"generated_dialogues": generated_dialogues}
     except Exception as e:

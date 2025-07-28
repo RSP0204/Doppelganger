@@ -2,10 +2,12 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Loader from './loader';
+import mammoth from 'mammoth';
 
 const LOCAL_STORAGE_TRANSCRIPT_KEY_PREFIX = 'uploadedTranscript_';
 const LOCAL_STORAGE_FILE_NAME_KEY_PREFIX = 'uploadedFileName_';
 const LOCAL_STORAGE_DIALOGUES_KEY_PREFIX = 'generatedDialogues_';
+const LOCAL_STORAGE_ROLE_KEY_PREFIX = 'selectedRole_';
 import { Button } from '@/registry/new-york-v4/ui/button';
 import {
   Select,
@@ -37,10 +39,12 @@ export default function TranscriptUploader({ setGeneratedDialogues, setShowResul
     const userSpecificDialoguesKey = `${LOCAL_STORAGE_DIALOGUES_KEY_PREFIX}${userId}`;
     const userSpecificFileNameKey = `${LOCAL_STORAGE_FILE_NAME_KEY_PREFIX}${userId}`;
     const userSpecificTranscriptKey = `${LOCAL_STORAGE_TRANSCRIPT_KEY_PREFIX}${userId}`;
+    const userSpecificRoleKey = `${LOCAL_STORAGE_ROLE_KEY_PREFIX}${userId}`;
 
     const savedDialogues = localStorage.getItem(userSpecificDialoguesKey);
     const savedFileName = localStorage.getItem(userSpecificFileNameKey);
     const savedTranscript = localStorage.getItem(userSpecificTranscriptKey);
+    const savedRole = localStorage.getItem(userSpecificRoleKey);
 
     if (savedDialogues) {
       setGeneratedDialogues(JSON.parse(savedDialogues));
@@ -49,17 +53,23 @@ export default function TranscriptUploader({ setGeneratedDialogues, setShowResul
       setGeneratedDialogues([]);
       setShowResults(false);
     }
-    if (savedFileName) {
+    if (savedFileName && savedTranscript) {
+      const blob = new Blob([savedTranscript], { type: 'text/plain' });
+      const file = new File([blob], savedFileName, { type: 'text/plain' });
+      setFile(file);
       setFileName(savedFileName);
-    } else {
-      setFileName(null);
-    }
-    if (savedTranscript) {
       setFileContent(savedTranscript);
-    } else {
-      setFileContent(null);
+    }
+    if (savedRole) {
+      setRole(savedRole);
     }
   }, [userId, setGeneratedDialogues, setShowResults, setFileName, setFileContent]);
+
+  useEffect(() => {
+    if (role && userId) {
+      localStorage.setItem(`${LOCAL_STORAGE_ROLE_KEY_PREFIX}${userId}`, role);
+    }
+  }, [role, userId]);
 
   const handleFileDrop = useCallback((droppedFile: File) => {
     if (!userId) return; // Cannot save without a user ID
@@ -70,6 +80,24 @@ export default function TranscriptUploader({ setGeneratedDialogues, setShowResul
 
     if (droppedFile.type.startsWith('audio/')) {
       setFileContent('Audio file loaded: ' + droppedFile.name);
+    } else if (droppedFile.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const arrayBuffer = e.target?.result as ArrayBuffer;
+        try {
+          const result = await mammoth.extractRawText({ arrayBuffer });
+          setFileContent(result.value);
+          localStorage.setItem(`${LOCAL_STORAGE_TRANSCRIPT_KEY_PREFIX}${userId}`, result.value);
+          localStorage.setItem(`${LOCAL_STORAGE_FILE_NAME_KEY_PREFIX}${userId}`, droppedFile.name);
+          localStorage.removeItem(`${LOCAL_STORAGE_DIALOGUES_KEY_PREFIX}${userId}`);
+          setGeneratedDialogues([]);
+          setShowResults(false);
+        } catch (error) {
+          console.error('Error reading .docx file:', error);
+          setFileContent('Error reading .docx file.');
+        }
+      };
+      reader.readAsArrayBuffer(droppedFile);
     } else {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -92,10 +120,12 @@ export default function TranscriptUploader({ setGeneratedDialogues, setShowResul
     setFile(null);
     setFileName(null);
     setFileContent(null);
+    setRole('');
 
     localStorage.removeItem(`${LOCAL_STORAGE_TRANSCRIPT_KEY_PREFIX}${userId}`);
     localStorage.removeItem(`${LOCAL_STORAGE_FILE_NAME_KEY_PREFIX}${userId}`);
     localStorage.removeItem(`${LOCAL_STORAGE_DIALOGUES_KEY_PREFIX}${userId}`);
+    localStorage.removeItem(`${LOCAL_STORAGE_ROLE_KEY_PREFIX}${userId}`);
 
     setGeneratedDialogues([]);
     setShowResults(false);
@@ -123,10 +153,16 @@ export default function TranscriptUploader({ setGeneratedDialogues, setShowResul
       }
 
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutes
+
         const res = await fetch('/process-audio', {
           method: 'POST',
           body: formData,
+          signal: controller.signal,
         });
+
+        clearTimeout(timeoutId);
 
         if (res.ok) {
           const data = await res.json();
@@ -147,6 +183,42 @@ export default function TranscriptUploader({ setGeneratedDialogues, setShowResul
       } finally {
         setIsLoading(false);
       }
+    } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('role', role);
+
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutes
+
+            const res = await fetch('/process-document', {
+                method: 'POST',
+                body: formData,
+                signal: controller.signal,
+            });
+
+            clearTimeout(timeoutId);
+
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.generated_dialogues) {
+                    const dialogues = Array.isArray(data.generated_dialogues) ? data.generated_dialogues : [];
+                    setGeneratedDialogues(dialogues);
+                    localStorage.setItem(`${LOCAL_STORAGE_DIALOGUES_KEY_PREFIX}${userId}`, JSON.stringify(dialogues));
+                } else {
+                    setGeneratedDialogues([]);
+                }
+                setShowResults(true);
+            } else {
+                setShowResults(false);
+            }
+        } catch (error) {
+            console.error('An error occurred during document processing:', error);
+            setShowResults(false);
+        } finally {
+            setIsLoading(false);
+        }
     } else {
       const reader = new FileReader();
       reader.onload = async (e) => {
@@ -154,13 +226,19 @@ export default function TranscriptUploader({ setGeneratedDialogues, setShowResul
 
         try {
           console.log('Sending transcript to backend:', { transcript: transcriptText.substring(0, 100) + '...', role });
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutes
+
           const res = await fetch('/process-transcript', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({ transcript: transcriptText, role }),
+            signal: controller.signal,
           });
+
+          clearTimeout(timeoutId);
 
           if (res.ok) {
             const data = await res.json();
@@ -212,7 +290,7 @@ export default function TranscriptUploader({ setGeneratedDialogues, setShowResul
         )}
         <div>
           <label className="text-sm font-medium">Act as:</label>
-          <Select onValueChange={setRole}>
+          <Select onValueChange={setRole} value={role}>
             <SelectTrigger>
               <SelectValue placeholder="Select a role" />
             </SelectTrigger>

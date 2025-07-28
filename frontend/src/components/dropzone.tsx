@@ -25,6 +25,7 @@ export default function Dropzone({ onFileDrop, onFileRemove, fileName }: Dropzon
       'text/plain': ['.txt'],
       'audio/wav': ['.wav'],
       'audio/flac': ['.flac'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
     },
     multiple: false,
   });
@@ -54,9 +55,9 @@ export default function Dropzone({ onFileDrop, onFileRemove, fileName }: Dropzon
           </button>
         </div>
       ) : (
-        <p className="mt-2">Drag & drop a .txt, .wav, or .flac file here, or click to select a file</p>
+        <p className="mt-2">Drag & drop a .txt, .wav, .flac, or .docx file here, or click to select a file</p>
       )}
-      <p className="text-xs text-gray-500 mt-1">Supported file types: TXT, WAV, FLAC</p>
+      <p className="text-xs text-gray-500 mt-1">Supported file types: TXT, WAV, FLAC, DOCX</p>
     </div>
   );
 }
