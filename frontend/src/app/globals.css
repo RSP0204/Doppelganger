@@ -248,3 +248,7 @@
   scrollbar-width: thin; /* "auto" or "thin" */
   scrollbar-color: #888 #f1f1f1; /* thumb color track color */
 }
+
+.dashboard-background {
+  background-color: #FFFAFA;
+}

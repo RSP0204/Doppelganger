@@ -189,34 +189,42 @@ export default function TranscriptUploader({ setGeneratedDialogues, setShowResul
         formData.append('role', role);
 
         try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutes
-
             const res = await fetch('/process-document', {
                 method: 'POST',
                 body: formData,
-                signal: controller.signal,
             });
-
-            clearTimeout(timeoutId);
 
             if (res.ok) {
                 const data = await res.json();
-                if (data && data.generated_dialogues) {
-                    const dialogues = Array.isArray(data.generated_dialogues) ? data.generated_dialogues : [];
-                    setGeneratedDialogues(dialogues);
-                    localStorage.setItem(`${LOCAL_STORAGE_DIALOGUES_KEY_PREFIX}${userId}`, JSON.stringify(dialogues));
-                } else {
-                    setGeneratedDialogues([]);
-                }
-                setShowResults(true);
+                const taskId = data.task_id;
+
+                const poll = async () => {
+                    const statusRes = await fetch(`/status/${taskId}`);
+                    const statusData = await statusRes.json();
+
+                    if (statusData.status === 'completed') {
+                        const dialogues = Array.isArray(statusData.result.generated_dialogues) ? statusData.result.generated_dialogues : [];
+                        setGeneratedDialogues(dialogues);
+                        localStorage.setItem(`${LOCAL_STORAGE_DIALOGUES_KEY_PREFIX}${userId}`, JSON.stringify(dialogues));
+                        setShowResults(true);
+                        setIsLoading(false);
+                    } else if (statusData.status === 'failed') {
+                        console.error('An error occurred during document processing:', statusData.error);
+                        setShowResults(false);
+                        setIsLoading(false);
+                    } else {
+                        setTimeout(poll, 5000);
+                    }
+                };
+
+                poll();
             } else {
                 setShowResults(false);
+                setIsLoading(false);
             }
         } catch (error) {
             console.error('An error occurred during document processing:', error);
             setShowResults(false);
-        } finally {
             setIsLoading(false);
         }
     } else {

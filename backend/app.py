@@ -1,6 +1,7 @@
 import os
 import tempfile
-from fastapi import FastAPI, HTTPException, File, UploadFile, Form
+import uuid
+from fastapi import FastAPI, HTTPException, File, UploadFile, Form, BackgroundTasks
 from pydantic import BaseModel
 from backend.chunker import chunk_transcript
 from backend.agent import generate_dialogue, process_with_llm
@@ -11,13 +12,32 @@ from backend.document_processing import read_docx
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "service-account.json"
 
 # To run this app, use the following command in your terminal:
-# uvicorn backend.app:app --reload
+# uvicorn backend.app:app
 
 app = FastAPI()
 
 class TranscriptRequest(BaseModel):
     transcript: str
     role: str
+
+# In-memory storage for task status and results
+tasks = {}
+
+def run_processing(task_id: str, temp_doc_file_path: str, role: str):
+    """Wrapper function to run the processing and store the result."""
+    try:
+        print("[Backend] Attempting to read .docx file...")
+        document_text = read_docx(temp_doc_file_path)
+        print(f"[Backend] .docx file read. Text length: {len(document_text)} characters.")
+        
+        result = process_with_llm(transcribed_text=document_text, role=role)
+        tasks[task_id] = {"status": "completed", "result": {"generated_dialogues": result}}
+    except Exception as e:
+        tasks[task_id] = {"status": "failed", "error": str(e)}
+    finally:
+        # Clean up the temporary file
+        if os.path.exists(temp_doc_file_path):
+            os.remove(temp_doc_file_path)
 
 @app.post("/process-transcript")
 async def process_transcript(request: TranscriptRequest):
@@ -103,11 +123,11 @@ async def process_audio(file: UploadFile = File(...), role: str = Form(...)):
         raise HTTPException(status_code=500, detail=f"LLM processing failed: {str(e)}")
 
 @app.post("/process-document")
-async def process_document(file: UploadFile = File(...), role: str = Form(...)):
+async def process_document(background_tasks: BackgroundTasks, file: UploadFile = File(...), role: str = Form(...)):
     print(f"[Backend] Received document: {file.filename}, Role: '{role}'")
     """
-    This endpoint receives a .docx file, extracts the text, processes it,
-    and returns a list of AI-generated questions and statements.
+    This endpoint receives a .docx file, extracts the text, processes it in the background,
+    and returns a task ID.
     """
     if not file:
         print("[Backend] Error: File cannot be empty.")
@@ -127,26 +147,25 @@ async def process_document(file: UploadFile = File(...), role: str = Form(...)):
             temp_doc_file.write(content)
             temp_doc_file_path = temp_doc_file.name
 
-        print("[Backend] Attempting to read .docx file...")
-        document_text = read_docx(temp_doc_file_path)
-        print(f"[Backend] .docx file read. Text length: {len(document_text)} characters.")
-
     except Exception as e:
         print(f"[Backend] Error during .docx processing: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to process .docx file: {str(e)}")
-    finally:
-        # Clean up the temporary file
-        if 'temp_doc_file_path' in locals() and os.path.exists(temp_doc_file_path):
-            os.remove(temp_doc_file_path)
 
-    try:
-        print("[Backend] Attempting to process document text with LLM...")
-        generated_dialogues = process_with_llm(transcribed_text=document_text, role=role)
-        print("[Backend] LLM processing complete.")
-        return {"generated_dialogues": generated_dialogues}
-    except Exception as e:
-        print(f"[Backend] Error during LLM processing: {e}")
-        raise HTTPException(status_code=500, detail=f"LLM processing failed: {str(e)}")
+    task_id = str(uuid.uuid4())
+    tasks[task_id] = {"status": "processing"}
+    background_tasks.add_task(run_processing, task_id, temp_doc_file_path, role)
+    
+    return {"message": "Processing started", "task_id": task_id}
+
+@app.get("/status/{task_id}")
+async def get_status(task_id: str):
+    """
+    This endpoint returns the status and result of a background task.
+    """
+    task = tasks.get(task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return task
 
 @app.get("/")
 async def root():

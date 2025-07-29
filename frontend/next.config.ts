@@ -29,15 +29,19 @@ const nextConfig: NextConfig = {
         return [
             {
                 source: '/process-transcript',
-                destination: 'http://127.0.0.1:8000/process-transcript', // Proxy to your FastAPI backend
+                destination: 'http://127.0.0.1:8001/process-transcript', // Proxy to your FastAPI backend
             },
             {
                 source: '/process-audio',
-                destination: 'http://127.0.0.1:8000/process-audio', // Proxy to your FastAPI backend
+                destination: 'http://127.0.0.1:8001/process-audio', // Proxy to your FastAPI backend
             },
             {
                 source: '/process-document',
-                destination: 'http://127.0.0.1:8000/process-document', // Proxy to your FastAPI backend
+                destination: 'http://127.0.0.1:8001/process-document', // Proxy to your FastAPI backend
+            },
+            {
+                source: '/status/:path*',
+                destination: 'http://127.0.0.1:8001/status/:path*', // Proxy to your FastAPI backend
             },
         ];
     }
