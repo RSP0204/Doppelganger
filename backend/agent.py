@@ -51,7 +51,7 @@ def process_with_llm(transcribed_text: str, role: str) -> list[dict]:
     chunks = chunk_transcript(transcribed_text)
     print(f"[Agent] Transcript chunked into {len(chunks)} chunks.")
 
-    # 2. Process each chunk and generate dialogue, ensuring no duplicate questions
+    # 2. Process each chunk and generate dialogue, ensuring no duplicate or nested questions
     generated_dialogues = []
     seen_questions = set()  # Keep track of questions we've already added
 
@@ -62,11 +62,18 @@ def process_with_llm(transcribed_text: str, role: str) -> list[dict]:
         if "suggested_questions" in dialogue_json:
             unique_questions = []
             for question in dialogue_json["suggested_questions"]:
-                if question not in seen_questions:
-                    unique_questions.append(question)
-                    seen_questions.add(question)
+                question_text = ""
+                # Handle both string and object-based questions
+                if isinstance(question, dict) and "question" in question:
+                    question_text = question["question"]
+                elif isinstance(question, str):
+                    question_text = question
+
+                if question_text and question_text not in seen_questions:
+                    unique_questions.append(question_text)
+                    seen_questions.add(question_text)
             
-            if unique_questions:  # Only add if there are new questions
+            if unique_questions:  # Only add if there are new, unique questions
                 dialogue_json["suggested_questions"] = unique_questions
                 generated_dialogues.append(dialogue_json)
         else:

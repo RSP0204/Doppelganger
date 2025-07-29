@@ -29,10 +29,10 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="container mx-auto p-4 flex flex-col items-center dashboard-background">
-      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
-        <div className="md:col-span-1 flex justify-center">
+    <div className="container mx-auto p-4 flex flex-col dashboard-background" style={{ height: 'calc(100vh - 5rem)' }}>
+      <h1 className="text-2xl font-bold mb-4 text-center">Dashboard</h1>
+      <div className="flex-grow flex flex-row gap-4 w-full overflow-hidden">
+        <div className="w-1/3 overflow-y-auto">
           <TranscriptUploader
             setGeneratedDialogues={setGeneratedDialogues}
             setShowResults={setShowResults}
@@ -42,12 +42,9 @@ export default function DashboardPage() {
             userId={userId}
           />
         </div>
-        <div className="md:col-span-2">
+        <div className="w-2/3 overflow-y-auto">
           {showResults && generatedDialogues && Array.isArray(generatedDialogues) && generatedDialogues.length > 0 && (
-            <>
-              {console.log("Rendering ResultsDisplay. showResults:", showResults, "generatedDialogues length:", generatedDialogues.length)}
-              <ResultsDisplay generatedDialogues={generatedDialogues} />
-            </>
+            <ResultsDisplay generatedDialogues={generatedDialogues} />
           )}
         </div>
       </div>
