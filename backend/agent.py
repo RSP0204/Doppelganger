@@ -51,12 +51,28 @@ def process_with_llm(transcribed_text: str, role: str) -> list[dict]:
     chunks = chunk_transcript(transcribed_text)
     print(f"[Agent] Transcript chunked into {len(chunks)} chunks.")
 
-    # 2. Process each chunk and generate dialogue
+    # 2. Process each chunk and generate dialogue, ensuring no duplicate questions
     generated_dialogues = []
+    seen_questions = set()  # Keep track of questions we've already added
+
     for i, chunk in enumerate(chunks):
         print(f"[Agent] Generating dialogue for chunk {i+1}/{len(chunks)}...")
         dialogue_json = generate_dialogue(role=role, transcript_chunk=chunk)
-        generated_dialogues.append(dialogue_json)
+        
+        if "suggested_questions" in dialogue_json:
+            unique_questions = []
+            for question in dialogue_json["suggested_questions"]:
+                if question not in seen_questions:
+                    unique_questions.append(question)
+                    seen_questions.add(question)
+            
+            if unique_questions:  # Only add if there are new questions
+                dialogue_json["suggested_questions"] = unique_questions
+                generated_dialogues.append(dialogue_json)
+        else:
+            # Handle cases where there's an error or no questions
+            generated_dialogues.append(dialogue_json)
+
         print(f"[Agent] Generated dialogue for chunk {i+1}: {dialogue_json}")
 
     print("[Agent] All dialogues generated successfully.")
