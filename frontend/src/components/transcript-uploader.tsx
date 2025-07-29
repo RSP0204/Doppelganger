@@ -98,19 +98,21 @@ export default function TranscriptUploader({ setGeneratedDialogues, setShowResul
         }
       };
       reader.readAsArrayBuffer(droppedFile);
-    } else {
+    } else if (droppedFile.type === 'text/plain') {
       const reader = new FileReader();
       reader.onload = (e) => {
         const content = e.target?.result as string;
         setFileContent(content);
         localStorage.setItem(`${LOCAL_STORAGE_TRANSCRIPT_KEY_PREFIX}${userId}`, content);
         localStorage.setItem(`${LOCAL_STORAGE_FILE_NAME_KEY_PREFIX}${userId}`, droppedFile.name);
-        // Clear previous results for the current user when a new file is dropped
         localStorage.removeItem(`${LOCAL_STORAGE_DIALOGUES_KEY_PREFIX}${userId}`);
         setGeneratedDialogues([]);
         setShowResults(false);
       };
-      reader.readAsDataURL(droppedFile);
+      reader.readAsText(droppedFile);
+    } else {
+      // Fallback for other file types, though they may not be processable
+      setFileContent(`Unsupported file type: ${droppedFile.type}`);
     }
   }, [setFileName, setFileContent, setGeneratedDialogues, setShowResults, userId]);
 
