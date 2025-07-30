@@ -60,7 +60,7 @@ export function NavHeader() {
                 <div className="flex items-center justify-start">
                     <Link href="/" className="flex items-center space-x-2">
                         <Image
-                            src="/images/logo.png"
+                            src="/images/doppelganger-logo.jpg"
                             alt="Doppelganger Logo"
                             width={40} // Equisimetric size
                             height={40} // Equisimetric size

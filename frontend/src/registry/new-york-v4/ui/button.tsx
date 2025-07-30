@@ -17,7 +17,9 @@ const buttonVariants = cva(
                 secondary: 'bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80',
                 ghost: 'hover:bg-accent hover:text-accent-foreground',
                 link: 'text-primary underline-offset-4 hover:underline',
-                gradient: 'bg-gradient-to-r from-[#446af8] to-[#4144fb] text-white shadow-xs hover:from-[#4144fb] hover:to-[#446af8]'
+                gradient: 'bg-gradient-to-r from-[#446af8] to-[#4144fb] text-white shadow-xs hover:from-[#4144fb] hover:to-[#446af8]',
+                'gradient-teal-1': 'bg-gradient-to-r from-[oklch(80%_0.1_180)] to-[oklch(70%_0.15_180)] text-white shadow-xs hover:from-[oklch(70%_0.15_180)] hover:to-[oklch(80%_0.1_180)]',
+                'gradient-teal-2': 'bg-gradient-to-r from-[oklch(85%_0.08_180)] to-[oklch(75%_0.12_180)] text-white shadow-xs hover:from-[oklch(75%_0.12_180)] hover:to-[oklch(85%_0.08_180)]'
             },
             size: {
                 default: 'h-9 px-4 py-2 has-[>svg]:px-3',
