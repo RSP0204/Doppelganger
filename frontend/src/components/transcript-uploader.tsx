@@ -150,7 +150,7 @@ export default function TranscriptUploader({ setGeneratedDialogues, setShowResul
       formData.append('role', role);
 
       // Log FormData contents for debugging
-      for (let [key, value] of formData.entries()) {
+      for (const [key, value] of formData.entries()) {
         console.log(`${key}:`, value);
       }
 

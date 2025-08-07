@@ -17,11 +17,21 @@ export function LoginForm({
 }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [isSignUp, setIsSignUp] = useState(false);
     const router = useRouter(); // Initialize useRouter
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('handleSubmit triggered!');
+        if (isSignUp) {
+            if (password !== confirmPassword) {
+                alert("Passwords don't match");
+                return;
+            }
+            console.log('Signing up...');
+        } else {
+            console.log('Logging in...');
+        }
     };
 
     return (
@@ -31,8 +41,14 @@ export function LoginForm({
                     <form className='p-6 md:p-8' onSubmit={handleSubmit}>
                         <div className='flex flex-col gap-6'>
                             <div className='flex flex-col items-center text-center'>
-                                <h1 className='text-2xl font-bold'>Welcome back</h1>
-                                <p className='text-muted-foreground text-balance'>Login to your Acme Inc account</p>
+                                <h1 className='text-2xl font-bold'>
+                                    {isSignUp ? 'Create an account' : 'Welcome back'}
+                                </h1>
+                                <p className='text-muted-foreground text-balance'>
+                                    {isSignUp
+                                        ? 'Enter your details to create an account'
+                                        : 'Login to your Acme Inc account'}
+                                </p>
                             </div>
                             <div className='grid gap-3'>
                                 <Label htmlFor='username'>Username</Label>
@@ -46,12 +62,7 @@ export function LoginForm({
                                 />
                             </div>
                             <div className='grid gap-3'>
-                                <div className='flex items-center'>
-                                    <Label htmlFor='password'>Password</Label>
-                                    <a href='#' className='ml-auto text-sm underline-offset-2 hover:underline'>
-                                        Forgot your password?
-                                    </a>
-                                </div>
+                                <Label htmlFor='password'>Password</Label>
                                 <Input
                                     id='password'
                                     type='password'
@@ -60,9 +71,41 @@ export function LoginForm({
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
                             </div>
-                            <Button type='submit' className='w-full'>
-                                Login
-                            </Button>
+                            {isSignUp && (
+                                <div className='grid gap-3'>
+                                    <Label htmlFor='confirm-password'>Confirm Password</Label>
+                                    <Input
+                                        id='confirm-password'
+                                        type='password'
+                                        required
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                    />
+                                </div>
+                            )}
+                            <div className='flex gap-4'>
+                                <Button
+                                    type='button'
+                                    variant={!isSignUp ? 'default' : 'outline'}
+                                    className='w-full'
+                                    onClick={() => setIsSignUp(false)}
+                                >
+                                    Login
+                                </Button>
+                                <Button
+                                    type='button'
+                                    variant={isSignUp ? 'default' : 'outline'}
+                                    className='w-full'
+                                    onClick={() => setIsSignUp(true)}
+                                >
+                                    Sign Up
+                                </Button>
+                            </div>
+                            {isSignUp && (
+                                <Button type='submit' className='w-full'>
+                                    Confirm
+                                </Button>
+                            )}
                             <div className='after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t'>
                                 <span className='bg-background text-muted-foreground relative z-10 px-2'>
                                     Or continue with
@@ -96,12 +139,6 @@ export function LoginForm({
                                     </svg>
                                     <span className='sr-only'>Login with Meta</span>
                                 </Button>
-                            </div>
-                            <div className='text-center text-sm'>
-                                Don&apos;t have an account?{' '}
-                                <a href='#' className='underline underline-offset-4'>
-                                    Sign up
-                                </a>
                             </div>
                         </div>
                     </form>
