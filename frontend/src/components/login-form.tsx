@@ -18,18 +18,55 @@ export function LoginForm({
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isSignUp, setIsSignUp] = useState(false);
+    const [error, setError] = useState('');
     const router = useRouter();
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setError('');
+
         if (isSignUp) {
             if (password !== confirmPassword) {
-                alert("Passwords don't match");
+                setError("Passwords don't match");
                 return;
             }
-            console.log('Signing up with:', { email, password });
+            try {
+                const res = await fetch('/api/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                if (res.ok) {
+                    setIsSignUp(false);
+                } else {
+                    const data = await res.json();
+                    setError(data.detail || 'Sign-up failed');
+                }
+            } catch (error) {
+                setError('An error occurred. Please try again.');
+            }
         } else {
-            console.log('Logging in with:', { username, password });
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email: username, password }),
+                });
+
+                if (res.ok) {
+                    router.push('/dashboard');
+                } else {
+                    const data = await res.json();
+                    setError(data.detail || 'Invalid credentials');
+                }
+            } catch (error) {
+                setError('An error occurred. Please try again.');
+            }
         }
     };
 
@@ -49,6 +86,8 @@ export function LoginForm({
                             </p>
                         </div>
 
+                        {error && <p className="text-red-500 text-center">{error}</p>}
+
                         {isSignUp ? (
                             <div className='grid gap-3'>
                                 <Label htmlFor='email'>Email</Label>
@@ -63,11 +102,11 @@ export function LoginForm({
                             </div>
                         ) : (
                             <div className='grid gap-3'>
-                                <Label htmlFor='username'>Username</Label>
+                                <Label htmlFor='username'>Email</Label>
                                 <Input
                                     id='username'
-                                    type='text'
-                                    placeholder='yourusername'
+                                    type='email'
+                                    placeholder='name@example.com'
                                     required
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
@@ -104,7 +143,10 @@ export function LoginForm({
                                 type={!isSignUp ? 'submit' : 'button'}
                                 variant={!isSignUp ? 'default' : 'outline'}
                                 className='w-full'
-                                onClick={() => setIsSignUp(false)}
+                                onClick={() => {
+                                    setIsSignUp(false);
+                                    setError('');
+                                }}
                             >
                                 Login
                             </Button>
@@ -112,7 +154,10 @@ export function LoginForm({
                                 type={isSignUp ? 'submit' : 'button'}
                                 variant={isSignUp ? 'default' : 'outline'}
                                 className='w-full'
-                                onClick={() => setIsSignUp(true)}
+                                onClick={() => {
+                                    setIsSignUp(true);
+                                    setError('');
+                                }}
                             >
                                 Sign Up
                             </Button>

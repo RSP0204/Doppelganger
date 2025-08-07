@@ -1,8 +1,10 @@
 import os
 import tempfile
 import uuid
+import json
 from fastapi import FastAPI, HTTPException, File, UploadFile, Form, BackgroundTasks
 from pydantic import BaseModel
+from passlib.context import CryptContext
 from backend.chunker import chunk_transcript
 from backend.agent import generate_dialogue, process_with_llm
 from backend.transcriber import transcribe_audio
@@ -15,6 +17,57 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "service-account.json"
 # uvicorn backend.app:app
 
 app = FastAPI()
+
+# Password Hashing
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# User data file
+USER_DATA_FILE = os.path.join(os.path.dirname(__file__), "userdata.json")
+
+class User(BaseModel):
+    email: str
+    password: str
+
+class UserInDB(User):
+    hashed_password: str
+
+def get_user(email: str):
+    if not os.path.exists(USER_DATA_FILE):
+        return None
+    with open(USER_DATA_FILE, "r") as f:
+        users = json.load(f)
+    for user in users:
+        if user["email"] == email:
+            return user
+    return None
+
+@app.post("/api/signup")
+async def signup(user: User):
+    if get_user(user.email):
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    hashed_password = pwd_context.hash(user.password)
+    user_in_db = UserInDB(email=user.email, password=user.password, hashed_password=hashed_password)
+    
+    users = []
+    if os.path.exists(USER_DATA_FILE):
+        with open(USER_DATA_FILE, "r") as f:
+            users = json.load(f)
+            
+    users.append(user_in_db.dict())
+    
+    with open(USER_DATA_FILE, "w") as f:
+        json.dump(users, f, indent=4)
+        
+    return {"message": "User created successfully"}
+
+@app.post("/api/login")
+async def login(user: User):
+    db_user = get_user(user.email)
+    if not db_user or not pwd_context.verify(user.password, db_user["hashed_password"]):
+        raise HTTPException(status_code=400, detail="Incorrect email or password")
+    
+    return {"message": "Login successful"}
 
 class TranscriptRequest(BaseModel):
     transcript: str

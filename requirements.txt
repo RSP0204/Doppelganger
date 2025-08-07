@@ -7,3 +7,4 @@ langchain
 python-multipart
 google-cloud-speech
 python-docx
+passlib[bcrypt]
