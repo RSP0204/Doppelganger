@@ -31,7 +31,7 @@ export function LoginForm({
                 return;
             }
             try {
-                const res = await fetch('/api/signup', {
+                const res = await fetch('http://localhost:8001/api/signup', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ export function LoginForm({
             }
         } else {
             try {
-                const res = await fetch('/api/login', {
+                const res = await fetch('http://localhost:8001/api/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

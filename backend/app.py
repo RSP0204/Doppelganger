@@ -3,6 +3,7 @@ import tempfile
 import uuid
 import json
 from fastapi import FastAPI, HTTPException, File, UploadFile, Form, BackgroundTasks
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from passlib.context import CryptContext
 from backend.chunker import chunk_transcript
@@ -17,6 +18,20 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "service-account.json"
 # uvicorn backend.app:app
 
 app = FastAPI()
+
+# CORS Middleware
+origins = [
+    "http://localhost",
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Password Hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
