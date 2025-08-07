@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation'; // Import useRouter
+import { useRouter } from 'next/navigation';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/registry/new-york-v4/ui/button';
@@ -12,16 +11,14 @@ import { Label } from '@/registry/new-york-v4/ui/label';
 
 export function LoginForm({
     className,
-    imageUrl,
     ...props
-}: React.ComponentProps<'div'> & {
-    imageUrl?: string;
-}) {
+}: React.ComponentProps<'div'>) {
     const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isSignUp, setIsSignUp] = useState(false);
-    const router = useRouter(); // Initialize useRouter
+    const router = useRouter();
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,16 +27,16 @@ export function LoginForm({
                 alert("Passwords don't match");
                 return;
             }
-            console.log('Signing up...');
+            console.log('Signing up with:', { email, password });
         } else {
-            console.log('Logging in...');
+            console.log('Logging in with:', { username, password });
         }
     };
 
     return (
-        <Card className={cn('overflow-hidden p-0', className)} {...props}>
-            <CardContent className='grid p-0 md:grid-cols-2'>
-                <form className='p-6 md:p-8' onSubmit={handleSubmit}>
+        <Card className={cn('w-full', className)} {...props}>
+            <CardContent className='p-6 md:p-8'>
+                <form onSubmit={handleSubmit}>
                     <div className='flex flex-col gap-6'>
                         <div className='flex flex-col items-center text-center'>
                             <h1 className='text-2xl font-bold'>
@@ -51,17 +48,33 @@ export function LoginForm({
                                     : 'Login to your Acme Inc account'}
                             </p>
                         </div>
-                        <div className='grid gap-3'>
-                            <Label htmlFor='username'>Username</Label>
-                            <Input
-                                id='username'
-                                type='text'
-                                placeholder='yourusername'
-                                required
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                            />
-                        </div>
+
+                        {isSignUp ? (
+                            <div className='grid gap-3'>
+                                <Label htmlFor='email'>Email</Label>
+                                <Input
+                                    id='email'
+                                    type='email'
+                                    placeholder='name@example.com'
+                                    required
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
+                            </div>
+                        ) : (
+                            <div className='grid gap-3'>
+                                <Label htmlFor='username'>Username</Label>
+                                <Input
+                                    id='username'
+                                    type='text'
+                                    placeholder='yourusername'
+                                    required
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                />
+                            </div>
+                        )}
+
                         <div className='grid gap-3'>
                             <Label htmlFor='password'>Password</Label>
                             <Input
@@ -72,6 +85,7 @@ export function LoginForm({
                                 onChange={(e) => setPassword(e.target.value)}
                             />
                         </div>
+
                         {isSignUp && (
                             <div className='grid gap-3'>
                                 <Label htmlFor='confirm-password'>Confirm Password</Label>
@@ -84,6 +98,7 @@ export function LoginForm({
                                 />
                             </div>
                         )}
+
                         <div className='flex gap-4'>
                             <Button
                                 type='button'
@@ -102,16 +117,19 @@ export function LoginForm({
                                 Sign Up
                             </Button>
                         </div>
+
                         {isSignUp && (
                             <Button type='submit' className='w-full'>
                                 Confirm
                             </Button>
                         )}
+
                         <div className='after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t'>
                             <span className='bg-background text-muted-foreground relative z-10 px-2'>
                                 Or continue with
                             </span>
                         </div>
+
                         <div className='grid grid-cols-3 gap-4'>
                             <Button variant='outline' type='button' className='w-full'>
                                 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>
@@ -143,16 +161,6 @@ export function LoginForm({
                         </div>
                     </div>
                 </form>
-                <div className='bg-primary/50 relative hidden md:block'>
-                    {imageUrl && (
-                        <Image
-                            fill
-                            src={imageUrl}
-                            alt='Image'
-                            className='absolute inset-0 h-full w-full object-cover'
-                        />
-                    )}
-                </div>
             </CardContent>
         </Card>
     );
