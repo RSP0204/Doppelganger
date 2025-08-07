@@ -1,64 +1,40 @@
-'use client';
-
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/registry/new-york-v4/ui/button';
-import { Input } from '@/registry/new-york-v4/ui/input';
+import { LoginForm } from '@/components/login-form';
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const { login } = useAuth();
-  const router = useRouter();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    try {
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      if (res.ok) {
-        login(username);
-        router.push('/dashboard');
-      } else {
-        const data = await res.json();
-        setError(data.message || 'Invalid credentials');
-      }
-    } catch (error) {
-      setError('An error occurred. Please try again.');
-    }
-  };
-
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      <form onSubmit={handleSubmit} className="p-8 border rounded-lg w-full max-w-sm">
-        <h1 className="text-2xl font-bold mb-4">Login</h1>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
-        <div className="space-y-4">
-          <Input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <Input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <Button type="submit" className="w-full">Login</Button>
+    return (
+        <div className='container relative grid h-screen flex-col items-center justify-center lg:max-w-none lg:grid-cols-2 lg:px-0'>
+            <div className='relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex'>
+                <div className='absolute inset-0 bg-zinc-900' />
+                <div className='relative z-20 flex items-center text-lg font-medium'>
+                    <svg
+                        xmlns='http://www.w3.org/2000/svg'
+                        viewBox='0 0 24 24'
+                        fill='none'
+                        stroke='currentColor'
+                        strokeWidth='2'
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        className='mr-2 h-6 w-6'
+                    >
+                        <path d='M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3' />
+                    </svg>
+                    Doppelganger
+                </div>
+                <div className='relative z-20 mt-auto'>
+                    <blockquote className='space-y-2'>
+                        <p className='text-lg'>
+                            &ldquo;This library has saved me countless hours of work and helped me deliver stunning
+                            designs to my clients faster than ever before.&rdquo;
+                        </p>
+                        <footer className='text-sm'>Sofia Davis</footer>
+                    </blockquote>
+                </div>
+            </div>
+            <div className='lg:p-8'>
+                <div className='mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]'>
+                    <LoginForm />
+                </div>
+            </div>
         </div>
-      </form>
-    </div>
-  );
+    );
 }
