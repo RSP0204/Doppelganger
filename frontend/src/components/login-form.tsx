@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/registry/new-york-v4/ui/button';
@@ -19,6 +20,7 @@ export function LoginForm({
     const [isSignUp, setIsSignUp] = useState(false);
     const [error, setError] = useState('');
     const router = useRouter();
+    const { login } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -58,6 +60,7 @@ export function LoginForm({
                 });
 
                 if (res.ok) {
+                    login(email);
                     router.push('/dashboard');
                 } else {
                     const data = await res.json();
