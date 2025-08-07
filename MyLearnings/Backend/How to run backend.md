@@ -33,3 +33,18 @@ The command to run the backend server is
 
 
    1 source .venv/Scripts/activate && uvicorn backend.app:app --port 8001
+
+   The original error was most likely caused by running the command from your
+  system's global Python installation, which doesn't have the necessary packages
+  installed, instead of the project's isolated virtual environment.
+
+
+  To fix this, you should run uvicorn as a module through the virtual
+  environment's Python interpreter. This ensures the correct packages are used.
+  Here is the command you should use to start the server:
+
+
+  .venv/Scripts/python.exe -m uvicorn backend.app:app --port 8001
+
+
+  This command should now correctly start your FastAPI application.
