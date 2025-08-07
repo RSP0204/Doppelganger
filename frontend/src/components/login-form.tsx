@@ -13,7 +13,6 @@ export function LoginForm({
     className,
     ...props
 }: React.ComponentProps<'div'>) {
-    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -55,7 +54,7 @@ export function LoginForm({
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ email: username, password }),
+                    body: JSON.stringify({ email, password }),
                 });
 
                 if (res.ok) {
@@ -88,31 +87,17 @@ export function LoginForm({
 
                         {error && <p className="text-red-500 text-center">{error}</p>}
 
-                        {isSignUp ? (
-                            <div className='grid gap-3'>
-                                <Label htmlFor='email'>Email</Label>
-                                <Input
-                                    id='email'
-                                    type='email'
-                                    placeholder='name@example.com'
-                                    required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                />
-                            </div>
-                        ) : (
-                            <div className='grid gap-3'>
-                                <Label htmlFor='username'>Email</Label>
-                                <Input
-                                    id='username'
-                                    type='email'
-                                    placeholder='name@example.com'
-                                    required
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                />
-                            </div>
-                        )}
+                        <div className='grid gap-3'>
+                            <Label htmlFor='email'>Email</Label>
+                            <Input
+                                id='email'
+                                type='email'
+                                placeholder='name@example.com'
+                                required
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
+                        </div>
 
                         <div className='grid gap-3'>
                             <Label htmlFor='password'>Password</Label>
