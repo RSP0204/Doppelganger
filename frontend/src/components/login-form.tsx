@@ -45,7 +45,7 @@ export function LoginForm({
                             <p className='text-muted-foreground text-balance'>
                                 {isSignUp
                                     ? 'Enter your details to create an account'
-                                    : 'Login to your Acme Inc account'}
+                                    : 'Login to your account'}
                             </p>
                         </div>
 
@@ -101,7 +101,7 @@ export function LoginForm({
 
                         <div className='flex gap-4'>
                             <Button
-                                type='button'
+                                type={!isSignUp ? 'submit' : 'button'}
                                 variant={!isSignUp ? 'default' : 'outline'}
                                 className='w-full'
                                 onClick={() => setIsSignUp(false)}
@@ -109,7 +109,7 @@ export function LoginForm({
                                 Login
                             </Button>
                             <Button
-                                type='button'
+                                type={isSignUp ? 'submit' : 'button'}
                                 variant={isSignUp ? 'default' : 'outline'}
                                 className='w-full'
                                 onClick={() => setIsSignUp(true)}
@@ -117,12 +117,6 @@ export function LoginForm({
                                 Sign Up
                             </Button>
                         </div>
-
-                        {isSignUp && (
-                            <Button type='submit' className='w-full'>
-                                Confirm
-                            </Button>
-                        )}
 
                         <div className='after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t'>
                             <span className='bg-background text-muted-foreground relative z-10 px-2'>
