@@ -5,6 +5,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { ThemeProvider } from 'next-themes';
 
 import NavHeader from '@/components/nav-header';
+import Footer from '@/components/footer';
 import '@/app/globals.css';
 import { Toaster } from '@/registry/new-york-v4/ui/sonner';
 
@@ -35,6 +36,7 @@ const Layout = ({ children }: Readonly<{ children: ReactNode }>) => {
                     <ThemeProvider attribute='class'>
                         <NavHeader />
                         <main className="">{children}</main>
+                        <Footer />
                         <Toaster />
                     </ThemeProvider>
                 </AuthProvider>

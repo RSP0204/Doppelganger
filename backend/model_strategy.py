@@ -11,11 +11,11 @@ from langchain_mistralai import ChatMistralAI
 
 class AIModelStrategy(ABC):
     @abstractmethod
-    def get_llm_chain(self, role: str) -> Runnable:
+    def get_llm_chain(self, role: str, context: str = None) -> Runnable:
         pass
 
 class GeminiStrategy(AIModelStrategy):
-    def get_llm_chain(self, role: str) -> Runnable:
+    def get_llm_chain(self, role: str, context: str = None) -> Runnable:
         print(f"[GeminiStrategy] Initializing LLMChain for role: {role}")
         if role not in PROMPT_TEMPLATES:
             raise ValueError(f"Role '{role}' is not supported.")
@@ -28,16 +28,22 @@ class GeminiStrategy(AIModelStrategy):
         llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=api_key)
         print("[GeminiStrategy] ChatGoogleGenerativeAI model initialized.")
 
+        template = PROMPT_TEMPLATES[role]
+        input_variables = ["transcript_chunk"]
+        if context:
+            template = "Here is some context for the conversation:\n{context}\n\n" + template
+            input_variables.append("context")
+
         prompt_template = PromptTemplate(
-            template=PROMPT_TEMPLATES[role],
-            input_variables=["transcript_chunk"],
+            template=template,
+            input_variables=input_variables,
         )
         print("[GeminiStrategy] PromptTemplate created.")
 
         return prompt_template | llm
 
 class MistralStrategy(AIModelStrategy):
-    def get_llm_chain(self, role: str) -> Runnable:
+    def get_llm_chain(self, role: str, context: str = None) -> Runnable:
         print(f"[MistralStrategy] Initializing LLMChain for role: {role}")
         if role not in PROMPT_TEMPLATES:
             raise ValueError(f"Role '{role}' is not supported.")
@@ -50,9 +56,15 @@ class MistralStrategy(AIModelStrategy):
         llm = ChatMistralAI(model="mistralai/mistral-small-3.2", mistral_api_key=api_key)
         print("[MistralStrategy] ChatMistralAI model initialized with mistralai/mistral-small-3.2.")
 
+        template = PROMPT_TEMPLATES[role]
+        input_variables = ["transcript_chunk"]
+        if context:
+            template = "Here is some context for the conversation:\n{context}\n\n" + template
+            input_variables.append("context")
+
         prompt_template = PromptTemplate(
-            template=PROMPT_TEMPLATES[role],
-            input_variables=["transcript_chunk"],
+            template=template,
+            input_variables=input_variables,
         )
         print("[MistralStrategy] PromptTemplate created.")
 

@@ -1,0 +1,18 @@
+Build Error
+
+Module not found: Can't resolve '@/components/ui/button'
+
+./src/app/live-std-questions/page.tsx (4:1)
+
+Module not found: Can't resolve '@/components/ui/button'
+  2 |
+  3 | import { useState, useRef, useEffect } from "react";
+> 4 | import { Button } from "@/components/ui/button";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 | import { Textarea } from "@/components/ui/textarea";
+  6 | import {
+  7 |   Select,
+
+Import map: aliased to relative './src/components/ui/button' inside of [project]/
+
+https://nextjs.org/docs/messages/module-not-found

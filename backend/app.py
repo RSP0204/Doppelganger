@@ -2,7 +2,7 @@ import os
 import tempfile
 import uuid
 import json
-from fastapi import FastAPI, HTTPException, File, UploadFile, Form, BackgroundTasks
+from fastapi import FastAPI, HTTPException, File, UploadFile, Form, BackgroundTasks, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from passlib.context import CryptContext
@@ -10,6 +10,7 @@ from backend.chunker import chunk_transcript
 from backend.agent import generate_dialogue, process_with_llm
 from backend.transcriber import transcribe_audio
 from backend.document_processing import read_docx
+from google.cloud import speech
 
 # Path to your service-account key
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "service-account.json"
@@ -234,6 +235,104 @@ async def get_status(task_id: str):
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
     return task
+
+@app.websocket("/ws/live-std-questions")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    
+    # Default values, will be updated by the client
+    conversation_context = ""
+    word_chunk_count = 90
+
+    # Receive settings from the client
+    try:
+        settings_data = await websocket.receive_json()
+        if settings_data.get("type") == "settings":
+            conversation_context = settings_data.get("conversationContext", "")
+            word_chunk_count = settings_data.get("wordChunkCount", 90)
+    except Exception as e:
+        print(f"Error receiving settings: {e}")
+        await websocket.close()
+        return
+
+    # Speech-to-Text setup
+    client = speech.SpeechClient()
+    config = speech.RecognitionConfig(
+        encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
+        sample_rate_hertz=16000,
+        language_code="en-US",
+        enable_automatic_punctuation=True,
+    )
+    
+    streaming_config = speech.StreamingRecognitionConfig(config=config, interim_results=True)
+    
+    async def audio_generator(ws: WebSocket):
+        while True:
+            try:
+                data = await ws.receive_bytes()
+                yield speech.StreamingRecognizeRequest(audio_content=data)
+            except WebSocketDisconnect:
+                break
+
+    requests = audio_generator(websocket)
+    responses = client.streaming_recognize(streaming_config, requests)
+    
+    transcript_buffer = ""
+    
+    try:
+        for response in responses:
+            if not response.results:
+                continue
+
+            result = response.results[0]
+            if not result.alternatives:
+                continue
+
+            transcript = result.alternatives[0].transcript
+            
+            if result.is_final:
+                transcript_buffer += transcript + " "
+                
+                await websocket.send_json({"type": "final_transcript", "data": transcript_buffer})
+
+                if len(transcript_buffer.split()) >= word_chunk_count:
+                    # Generate questions
+                    dialogue = generate_dialogue(role="interviewer", transcript_chunk=transcript_buffer, context=conversation_context)
+                    questions = [item for item in dialogue if item.startswith("Q:")]
+
+                    await websocket.send_json({"type": "questions", "data": questions})
+                    
+                    # Reset buffer
+                    transcript_buffer = ""
+            else:
+                await websocket.send_json({"type": "interim_transcript", "data": transcript})
+
+    except Exception as e:
+        print(f"Error in WebSocket: {e}")
+    finally:
+        await websocket.close()
+
+
+@app.post("/api/transcribe-context")
+async def transcribe_context(file: UploadFile = File(...)):
+    """
+    This endpoint receives a small audio file for the context, transcribes it,
+    and returns the transcript.
+    """
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".webm") as temp_audio_file:
+            content = await file.read()
+            temp_audio_file.write(content)
+            temp_audio_file_path = temp_audio_file.name
+
+        transcript = transcribe_audio(temp_audio_file_path)
+        return {"transcript": transcript}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Audio transcription failed: {str(e)}")
+    finally:
+        if 'temp_audio_file_path' in locals() and os.path.exists(temp_audio_file_path):
+            os.remove(temp_audio_file_path)
+
 
 @app.get("/")
 async def root():

@@ -1,11 +1,14 @@
+import Link from "next/link";
+
 const Footer = () => {
     return (
         <footer className="py-8 text-center text-sm text-muted-foreground">
             <div className="flex justify-center space-x-4">
-                <a href="#">Features</a>
-                <a href="#">Pricing</a>
-                <a href="#">About Us</a>
-                <a href="#">Contact</a>
+                <Link href="#">Features</Link>
+                <Link href="#">Pricing</Link>
+                <Link href="#">About Us</Link>
+                <Link href="#">Contact</Link>
+                <Link href="/live-std-questions">Live Questions</Link>
             </div>
             <div className="flex justify-center mt-4 space-x-4">
                 {/* Social media icons placeholder */}
